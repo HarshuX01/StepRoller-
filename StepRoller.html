@@ -1,0 +1,3804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0b5cff">
+<title>StepRoller Beta</title>
+<style>
+:root{
+  --bg:#f6f9ff;
+  --surface:#ffffff;
+  --surface-2:#eef5ff;
+  --text:#12233f;
+  --muted:#6e7d95;
+  --blue:#0b5cff;
+  --blue-2:#62b6ff;
+  --nav:#10264c;
+  --line:#dce7f7;
+  --success:#12a66a;
+  --warning:#ffb020;
+  --shadow:0 16px 40px rgba(29,74,132,.10);
+  --radius:22px;
+}
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent
+}
+html,body{
+  margin:0;
+  min-height:100%;
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text)
+}
+body{
+  display:flex;
+  justify-content:center
+}
+button,input,textarea{
+  font:inherit
+}
+button{
+  border:0;
+  cursor:pointer
+}
+.app{
+  width:min(100%,520px);
+  min-height:100vh;
+  background:linear-gradient(180deg,#fafdff 0,#f3f8ff 100%);
+  position:relative;
+  overflow-x:hidden
+}
+.screen{
+  display:none;
+  min-height:100vh;
+  padding:20px 18px 112px
+}
+.screen.active{
+  display:block
+}
+.splash{
+  position:fixed;
+  inset:0;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:100;
+  transition:opacity .65s ease,visibility .65s
+}
+.splash.hide{
+  opacity:0;
+  visibility:hidden
+}
+
+.offline-gate{
+  position:fixed;
+  inset:0;
+  z-index:1200;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:12px;
+  padding:24px;
+  text-align:center;
+  background:#fff;
+  color:#12345b;
+}
+.offline-gate.visible{display:flex}
+.offline-mark{
+  width:52px;
+  height:52px;
+  border:5px solid #dcecff;
+  border-top-color:#0b5cff;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+.offline-gate strong{font-size:23px;font-weight:950;letter-spacing:-.6px}
+.offline-gate span{color:#64748b;font-size:13px;max-width:260px;line-height:1.5}
+@keyframes spin{to{transform:rotate(360deg)}}
+.logo-word{
+  font-size:34px;
+  font-weight:900;
+  letter-spacing:-1.8px;
+  color:#13345f;
+  animation:logoIn 1.15s ease forwards
+}
+.logo-word span{
+  color:var(--blue)
+}
+@keyframes logoIn{
+  0%{
+    opacity:0;
+    transform:translateY(18px) scale(.96)
+  }
+  55%{
+    opacity:1;
+    transform:translateY(0) scale(1)
+  }
+  100%{
+    opacity:1
+  }
+}
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px
+}
+.profile-mini{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-width:0
+}
+.avatar{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#d9edff,#7cbfff);
+  display:grid;
+  place-items:center;
+  font-weight:900;
+  color:#1450a8;
+  border:2px solid #fff;
+  box-shadow:0 8px 22px rgba(55,132,225,.18)
+}
+.name-badge{
+  font-weight:800;
+  font-size:15px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:175px
+}
+.cup-pill{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  background:#fff;
+  border:1px solid var(--line);
+  padding:8px 11px;
+  border-radius:14px;
+  box-shadow:0 8px 20px rgba(29,74,132,.07);
+  font-weight:900
+}
+.cup-icon{
+  width:20px;
+  height:20px;
+  display:inline-block
+}
+.verified{
+  display:inline-grid;
+  place-items:center;
+  width:19px;
+  height:19px;
+  border-radius:50%;
+  color:#fff;
+  font-size:11px;
+  margin-left:4px;
+  vertical-align:-3px;
+  box-shadow:0 4px 8px rgba(0,0,0,.12)
+}
+.verified.owner{
+  background:#1388ff
+}
+.verified.partner{
+  background:#dcae23
+}
+.verified.bronze{
+  background:#ad6f48
+}
+.hero{
+  margin-top:18px;
+  background:linear-gradient(145deg,#ffffff 0,#edf6ff 100%);
+  border:1px solid #e2ecf8;
+  border-radius:28px;
+  padding:20px;
+  box-shadow:var(--shadow)
+}
+.eyebrow{
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.11em;
+  color:#7d91ac;
+  text-transform:uppercase
+}
+.hero h1{
+  font-size:25px;
+  letter-spacing:-.7px;
+  margin:5px 0 4px
+}
+.hero p{
+  margin:0;
+  color:var(--muted);
+  font-size:13px
+}
+.step-ring{
+  width:200px;
+  height:200px;
+  border-radius:50%;
+  margin:24px auto 10px;
+  display:grid;
+  place-items:center;
+  background:conic-gradient(var(--blue) var(--progress,0%),#dcecff 0);
+  padding:10px;
+  box-shadow:inset 0 0 0 1px #d8e8ff,0 18px 38px rgba(37,101,192,.14)
+}
+.step-core{
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center
+}
+.steps{
+  font-size:48px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:-2px
+}
+.step-label{
+  margin-top:7px;
+  color:#7b8ba3;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase
+}
+.distance{
+  text-align:center;
+  font-weight:900;
+  color:#31547d;
+  font-size:16px
+}
+.running{
+  display:flex;
+  justify-content:center;
+  margin:12px 0 0
+}
+.running span{
+  background:#e9f4ff;
+  color:#0865ca;
+  padding:6px 11px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900
+}
+.stat-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:9px;
+  margin-top:16px
+}
+.stat{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:11px 6px;
+  text-align:center;
+  box-shadow:0 8px 18px rgba(29,74,132,.06)
+}
+.stat button{
+  background:none;
+  width:100%;
+  padding:0;
+  color:inherit
+}
+.stat .t{
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:#7f8da3;
+  font-weight:900
+}
+.stat .v{
+  margin-top:5px;
+  font-size:15px;
+  font-weight:950
+}
+.section-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:22px 2px 10px
+}
+.section-title h2{
+  margin:0;
+  font-size:16px
+}
+.section-title small{
+  color:var(--muted);
+  font-size:11px
+}
+.history-card,.panel{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px;
+  box-shadow:0 10px 24px rgba(29,74,132,.06)
+}
+.history-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:11px 0;
+  border-bottom:1px solid #edf2f8
+}
+.history-row:last-child{
+  border-bottom:0
+}
+.history-row strong{
+  font-size:13px
+}
+.history-row span{
+  font-weight:900;
+  color:#1b66bf
+}
+.reward-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px
+}
+.reward-card{
+  background:var(--nav);
+  color:#fff;
+  border-radius:18px;
+  padding:13px;
+  min-height:90px;
+  position:relative;
+  overflow:hidden
+}
+.reward-card:before{
+  content:"";
+  position:absolute;
+  inset:-45px auto auto -40px;
+  width:110px;
+  height:110px;
+  border-radius:50%;
+  background:rgba(98,182,255,.14)
+}
+.reward-day{
+  font-weight:950;
+  font-size:14px
+}
+.reward-cups{
+  margin-top:7px;
+  font-size:12px;
+  color:#b9d7ff;
+  font-weight:800
+}
+.claim{
+  margin-top:10px;
+  background:#fff;
+  color:#14305a;
+  border-radius:11px;
+  padding:7px 11px;
+  font-size:11px;
+  font-weight:950
+}
+.claim:disabled{
+  opacity:.45;
+  cursor:not-allowed
+}
+.bottom-nav{
+  position:fixed;
+  bottom:12px;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(calc(100% - 24px),496px);
+  display:flex;
+  gap:7px;
+  background:var(--nav);
+  border-radius:18px;
+  padding:7px;
+  box-shadow:0 18px 38px rgba(10,35,76,.24);
+  z-index:20
+}
+.nav-btn{
+  flex:1;
+  background:transparent;
+  color:#b9c9e2;
+  padding:10px 4px;
+  border-radius:13px;
+  font-size:10px;
+  font-weight:900
+}
+.nav-btn.active{
+  background:#fff;
+  color:#12305a
+}
+.nav-btn.locked{
+  opacity:.48
+}
+.icon{
+  font-size:18px;
+  display:block;
+  line-height:1;
+  margin-bottom:3px
+}
+.page-title{
+  font-size:24px;
+  font-weight:950;
+  letter-spacing:-.7px;
+  margin:3px 0 4px
+}
+.page-sub{
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:16px
+}
+.tabs{
+  display:flex;
+  gap:8px;
+  background:#e8f1ff;
+  padding:6px;
+  border-radius:15px;
+  margin-bottom:13px
+}
+.tab{
+  flex:1;
+  padding:10px;
+  border-radius:11px;
+  background:transparent;
+  color:#6e7d95;
+  font-size:12px;
+  font-weight:900
+}
+.tab.active{
+  background:#fff;
+  color:#0b5cff;
+  box-shadow:0 7px 16px rgba(45,105,180,.10)
+}
+.leader-row{
+  display:grid;
+  grid-template-columns:30px 1fr auto;
+  gap:10px;
+  align-items:center;
+  padding:12px;
+  border-bottom:1px solid #edf2f8
+}
+.leader-row:last-child{
+  border-bottom:0
+}
+.rank{
+  width:27px;
+  height:27px;
+  border-radius:9px;
+  background:#edf4ff;
+  display:grid;
+  place-items:center;
+  font-weight:950;
+  font-size:11px
+}
+.person{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-width:0
+}
+.person .meta{
+  min-width:0
+}
+.person strong{
+  display:block;
+  font-size:13px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis
+}
+.person small{
+  display:block;
+  color:var(--muted);
+  font-size:10px;
+  margin-top:2px
+}
+.leader-steps{
+  font-weight:950;
+  font-size:12px
+}
+.empty{
+  text-align:center;
+  padding:30px 10px;
+  color:var(--muted);
+  font-size:13px;
+  font-weight:800
+}
+.profile-head{
+  text-align:center
+}
+.profile-big{
+  width:92px;
+  height:92px;
+  border-radius:50%;
+  margin:2px auto 10px;
+  background:linear-gradient(135deg,#e5f2ff,#7fbfff);
+  display:grid;
+  place-items:center;
+  font-size:30px;
+  font-weight:950;
+  color:#1657ad;
+  border:4px solid #fff;
+  box-shadow:0 18px 35px rgba(26,96,180,.18)
+}
+.profile-name{
+  font-size:22px;
+  font-weight:950
+}
+.profile-meta{
+  margin-top:5px;
+  color:var(--muted);
+  font-size:12px
+}
+.profile-stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin:16px 0
+}
+.mini-stat{
+  background:#f6faff;
+  border:1px solid var(--line);
+  padding:12px 8px;
+  border-radius:15px;
+  text-align:center
+}
+.mini-stat b{
+  display:block;
+  font-size:15px
+}
+.mini-stat span{
+  display:block;
+  color:var(--muted);
+  font-size:9px;
+  text-transform:uppercase;
+  font-weight:900;
+  margin-top:3px
+}
+.menu-list{
+  display:grid;
+  gap:9px
+}
+.menu-btn{
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#fff;
+  border:1px solid var(--line);
+  padding:14px;
+  border-radius:15px;
+  text-align:left;
+  font-weight:900;
+  color:var(--text);
+  box-shadow:0 8px 16px rgba(29,74,132,.04)
+}
+.menu-btn span{
+  color:#94a3b8
+}
+.back{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  background:#fff;
+  border:1px solid var(--line);
+  padding:9px 12px;
+  border-radius:12px;
+  font-weight:900;
+  color:#14345e;
+  margin-bottom:14px
+}
+.overlay-page{
+  padding-top:10px
+}
+.settings-section{
+  margin-top:12px
+}
+.settings-section h3{
+  font-size:13px;
+  margin:16px 3px 8px
+}
+.choice-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px
+}
+.choice{
+  padding:13px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#fff;
+  font-weight:900
+}
+.choice.selected{
+  outline:2px solid var(--blue);
+  background:#f4f9ff;
+  color:#0b5cff
+}
+.form{
+  display:grid;
+  gap:10px
+}
+.input{
+  width:100%;
+  padding:13px 14px;
+  border:1px solid #ccd9eb;
+  border-radius:14px;
+  outline:none;
+  background:#fff
+}
+.input:focus{
+  border-color:#7db5ff;
+  box-shadow:0 0 0 4px rgba(11,92,255,.08)
+}
+.primary{
+  background:var(--blue);
+  color:#fff;
+  padding:13px 15px;
+  border-radius:14px;
+  font-weight:950
+}
+.secondary{
+  background:#edf4ff;
+  color:#17437e;
+  padding:13px 15px;
+  border-radius:14px;
+  font-weight:950
+}
+.auth-card{
+  margin-top:18px
+}
+.auth-title{
+  font-size:19px;
+  font-weight:950;
+  margin-bottom:5px
+}
+.auth-note{
+  font-size:11px;
+  color:var(--muted);
+  line-height:1.5;
+  margin-bottom:12px
+}
+.billing-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px
+}
+.plan{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:16px;
+  position:relative
+}
+.plan h3{
+  margin:0;
+  font-size:18px
+}
+.plan .price{
+  font-size:25px;
+  font-weight:950;
+  margin:7px 0
+}
+.plan ul{
+  padding:0;
+  margin:10px 0 14px;
+  list-style:none;
+  display:grid;
+  gap:7px;
+  font-size:11px;
+  color:#53657f
+}
+.plan li{
+  font-weight:800
+}
+.badge-lite,.badge-advance{
+  display:inline-flex;
+  align-items:center;
+  padding:3px 8px;
+  border-radius:9px;
+  font-size:9px;
+  font-weight:950;
+  margin-left:5px
+}
+.badge-lite{
+  background:#e4efff;
+  border:1px solid #75aaff;
+  color:#2368c7
+}
+.badge-advance{
+  background:#fbf0d6;
+  border:1px solid #d6aa49;
+  color:#9c6a08
+}
+.subscribe{
+  width:100%;
+  background:var(--nav);
+  color:#fff;
+  padding:11px;
+  border-radius:12px;
+  font-size:11px;
+  font-weight:950
+}
+.subscribe.claimed{
+  background:#d9dee7;
+  color:#708096
+}
+.feedback-wrap{
+  position:fixed;
+  inset:0;
+  background:rgba(6,22,46,.42);
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  padding:12px;
+  z-index:30
+}
+.feedback-wrap.show{
+  display:flex
+}
+.feedback{
+  width:min(100%,496px);
+  background:#fff;
+  border-radius:24px;
+  padding:17px;
+  box-shadow:0 22px 50px rgba(5,22,48,.26)
+}
+.feedback h3{
+  margin:0 0 10px
+}
+.textarea{
+  width:100%;
+  min-height:130px;
+  border:1px solid #ccd9eb;
+  border-radius:14px;
+  padding:12px;
+  resize:none;
+  outline:none
+}
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:88px;
+  transform:translate(-50%,18px);
+  background:#10264c;
+  color:#fff;
+  padding:10px 13px;
+  border-radius:12px;
+  font-size:11px;
+  font-weight:900;
+  opacity:0;
+  pointer-events:none;
+  transition:all .25s ease;
+  z-index:40;
+  max-width:calc(100% - 40px);
+  text-align:center
+}
+.toast.show{
+  opacity:1;
+  transform:translate(-50%,0)
+}
+.event-card{
+  background:linear-gradient(145deg,#0d2d61,#0d5cff);
+  color:#fff;
+  border-radius:23px;
+  padding:18px;
+  box-shadow:var(--shadow)
+}
+.event-card h3{
+  margin:0;
+  font-size:20px
+}
+.event-card p{
+  font-size:11px;
+  color:#cfe1ff;
+  line-height:1.5
+}
+.progress{
+  height:12px;
+  background:rgba(255,255,255,.16);
+  border-radius:99px;
+  overflow:hidden
+}
+.bar{
+  height:100%;
+  width:0;
+  background:#fff;
+  border-radius:99px
+}
+.event-row{
+  display:flex;
+  justify-content:space-between;
+  font-size:11px;
+  font-weight:900;
+  margin:8px 0 12px
+}
+.winter-task{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:14px
+}
+.winter-task h4{
+  margin:0 0 6px;
+  font-size:14px
+}
+.winter-task p{
+  margin:0;
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.5
+}
+.timer{
+  font-size:24px;
+  font-weight:950;
+  margin:10px 0
+}
+.arc-grid{
+  display:grid;
+  gap:9px;
+  margin-top:12px
+}
+.lock-chip{
+  display:inline-flex;
+  background:#edf1f6;
+  color:#7e8c9d;
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:9px;
+  font-weight:950
+}
+.permission-row,.data-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 0;
+  border-bottom:1px solid #edf2f8;
+  font-size:12px
+}
+.permission-row:last-child,.data-row:last-child{
+  border-bottom:0
+}
+.toggle{
+  width:43px;
+  height:25px;
+  border-radius:99px;
+  background:#cfd9e7;
+  padding:3px
+}
+.toggle i{
+  width:19px;
+  height:19px;
+  border-radius:50%;
+  display:block;
+  background:#fff;
+  transition:transform .2s
+}
+.toggle.on{
+  background:#1688ff
+}
+.toggle.on i{
+  transform:translateX(18px)
+}
+.owner-panel{
+  background:#eef7ff;
+  border:1px solid #cbe3ff;
+  border-radius:15px;
+  padding:10px;
+  font-size:10px;
+  color:#2e5d91;
+  margin-top:11px;
+  line-height:1.5
+}
+@media (min-width:700px){
+  .app{
+    min-height:100vh;
+    box-shadow:0 0 0 1px #dfe9f7,0 25px 70px rgba(29,74,132,.10)
+  }
+}
+.dark{
+  --bg:#091423;
+  --surface:#101d31;
+  --surface-2:#14253c;
+  --text:#edf5ff;
+  --muted:#91a5c0;
+  --blue:#4f9bff;
+  --blue-2:#7ec0ff;
+  --nav:#06101e;
+  --line:#20334d;
+  --shadow:0 18px 45px rgba(0,0,0,.25)
+}
+.dark .app,.dark body{
+  background:linear-gradient(180deg,#0a1524,#091423)
+}
+.dark .hero,.dark .history-card,.dark .panel,.dark .stat,.dark .plan,.dark .menu-btn,.dark .choice,.dark .winter-task,.dark .feedback,.dark .cup-pill,.dark .back,.dark .input,.dark .textarea,.dark .mini-stat{
+  background:#101d31;
+  color:var(--text);
+  border-color:#20334d
+}
+.dark .step-core{
+  background:#0e1a2b
+}
+.dark .tabs{
+  background:#0d1a2d
+}
+.dark .tab.active{
+  background:#13253c
+}
+.dark .splash{
+  background:#091423
+}
+.dark .logo-word{
+  color:#eaf3ff
+}
+.dark .claim{
+  background:#dcecff;
+  color:#153b6e
+}
+.dark .subscribe{
+  background:#183253
+}
+
+/* ========================================================================== *
+   StepRoller Beta professional component layer
+   ========================================================================== */
+.sr-stack-1 {
+  display:grid;gap:4px;
+}
+.sr-stack-2 {
+  display:grid;gap:8px;
+}
+.sr-stack-3 {
+  display:grid;gap:12px;
+}
+.sr-stack-4 {
+  display:grid;gap:16px;
+}
+.sr-row-1 {
+  display:flex;align-items:center;gap:4px;
+}
+.sr-row-2 {
+  display:flex;align-items:center;gap:8px;
+}
+.sr-row-3 {
+  display:flex;align-items:center;gap:12px;
+}
+.sr-row-between {
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.sr-card-soft {
+  background:var(--surface-soft);border:1px solid var(--line);border-radius:var(--radius-md);
+}
+.sr-card-flat {
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);box-shadow:none;
+}
+.sr-card-elevated {
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);
+}
+.sr-border {
+  border:1px solid var(--line);
+}
+.sr-border-blue {
+  border:1px solid #a8ccff;
+}
+.sr-radius-sm {
+  border-radius:var(--radius-sm);
+}
+.sr-radius-md {
+  border-radius:var(--radius-md);
+}
+.sr-radius-lg {
+  border-radius:var(--radius-lg);
+}
+.sr-radius-xl {
+  border-radius:var(--radius-xl);
+}
+.sr-radius-pill {
+  border-radius:999px;
+}
+.sr-shadow-xs {
+  box-shadow:var(--shadow-xs);
+}
+.sr-shadow-sm {
+  box-shadow:var(--shadow-sm);
+}
+.sr-shadow-md {
+  box-shadow:var(--shadow-md);
+}
+.sr-shadow-lg {
+  box-shadow:var(--shadow-lg);
+}
+.sr-text-muted {
+  color:var(--muted);
+}
+.sr-text-strong {
+  color:var(--text-strong);font-weight:950;
+}
+.sr-text-blue {
+  color:var(--blue);
+}
+.sr-text-center {
+  text-align:center;
+}
+.sr-text-right {
+  text-align:right;
+}
+.sr-w-full {
+  width:100%;
+}
+.sr-h-full {
+  height:100%;
+}
+.sr-flex-1 {
+  flex:1 1 auto;
+}
+.sr-min-0 {
+  min-width:0;
+}
+.sr-overflow-hidden {
+  overflow:hidden;
+}
+.sr-pos-relative {
+  position:relative;
+}
+.sr-pos-absolute {
+  position:absolute;
+}
+.sr-pointer {
+  cursor:pointer;
+}
+.sr-no-pointer {
+  pointer-events:none;
+}
+.sr-state-press {
+  transform:translateY(1px) scale(.992);
+}
+.sr-state-hover-lift {
+  transform:translateY(-1px);box-shadow:var(--shadow-md);
+}
+.sr-state-focus-blue {
+  outline:none;box-shadow:0 0 0 4px rgba(11,92,255,.10);
+}
+.sr-state-disabled-soft {
+  opacity:.5;filter:saturate(.7);
+}
+.sr-state-muted {
+  opacity:.68;
+}
+.sr-motion-shell {
+  display:grid;
+  place-items:center;
+  position:relative;
+  width:100px;
+  height:100px;
+  border-radius:50%;
+  background:conic-gradient(var(--blue) 0deg,#dbe9f8 0deg);
+}
+.sr-motion-core {
+  width:82px;
+  height:82px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:var(--surface);
+  font-size:12px;
+  font-weight:950;
+}
+.sr-motion-pulse {
+  animation:sr-motion-pulse 1.8s ease-in-out infinite;
+}
+.sr-motion-idle {
+  opacity:.72;
+}
+.sr-motion-ready {
+  box-shadow:0 0 0 8px rgba(11,92,255,.05),var(--shadow-sm);
+}
+@keyframes sr-motion-pulse {
+  0%,100% { transform:scale(1); opacity:1; }
+  50% { transform:scale(1.015); opacity:.88; }
+}
+.sr-stat-01 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-01 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-01 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-02 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-02 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-02 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-03 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-03 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-03 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-04 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-04 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-04 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-05 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-05 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-05 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-06 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-06 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-06 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-07 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-07 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-07 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-08 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-08 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-08 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-09 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-09 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-09 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-10 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-10 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-10 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-11 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-11 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-11 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-12 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-12 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-12 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-13 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-13 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-13 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-14 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-14 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-14 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-15 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-15 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-15 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-16 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-16 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-16 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-17 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-17 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-17 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-18 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-18 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-18 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-19 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-19 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-19 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-20 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-20 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-20 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-21 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-21 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-21 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-22 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-22 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-22 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-23 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-23 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-23 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-24 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-24 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-24 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-25 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-25 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-25 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-26 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-26 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-26 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-27 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-27 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-27 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-28 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-28 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-28 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-29 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-29 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-29 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+.sr-stat-30 {
+  min-height:56px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--surface);
+  box-shadow:var(--shadow-xs);
+}
+.sr-stat-30 .label {
+  color:var(--muted);
+  font-size:8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.sr-stat-30 .value {
+  margin-top:5px;
+  color:var(--text-strong);
+  font-size:14px;
+  font-weight:950;
+}
+@media (max-width:320px) {
+  .sr-responsive-320 {
+    width:100%;
+  }
+  .sr-responsive-320-stack {
+    grid-template-columns:1fr;
+  }
+}
+@media (max-width:340px) {
+  .sr-responsive-340 {
+    width:100%;
+  }
+  .sr-responsive-340-stack {
+    grid-template-columns:1fr;
+  }
+}
+@media (max-width:360px) {
+  .sr-responsive-360 {
+    width:100%;
+  }
+  .sr-responsive-360-stack {
+    grid-template-columns:1fr;
+  }
+}
+@media (max-width:380px) {
+  .sr-responsive-380 {
+    width:100%;
+  }
+  .sr-responsive-380-stack {
+    grid-template-columns:1fr;
+  }
+}
+@media (max-width:400px) {
+  .sr-responsive-400 {
+    width:100%;
+  }
+  .sr-responsive-400-stack {
+    grid-template-columns:1fr;
+  }
+}
+@media (max-width:420px) {
+  .sr-responsive-420 {
+    width:100%;
+  }
+  .sr-responsive-420-stack {
+    grid-template-columns:1fr;
+  }
+}
+@media (max-width:440px) {
+  .sr-responsive-440 {
+    width:100%;
+  }
+  .sr-responsive-440-stack {
+    grid-template-columns:1fr;
+  }
+}
+@media (max-width:460px) {
+  .sr-responsive-460 {
+    width:100%;
+  }
+  .sr-responsive-460-stack {
+    grid-template-columns:1fr;
+  }
+}
+@media (max-width:480px) {
+  .sr-responsive-480 {
+    width:100%;
+  }
+  .sr-responsive-480-stack {
+    grid-template-columns:1fr;
+  }
+}
+@media (max-width:500px) {
+  .sr-responsive-500 {
+    width:100%;
+  }
+  .sr-responsive-500-stack {
+    grid-template-columns:1fr;
+  }
+}
+.dark .sr-stat-01 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-01 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-02 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-02 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-03 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-03 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-04 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-04 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-05 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-05 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-06 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-06 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-07 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-07 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-08 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-08 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-09 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-09 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-10 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-10 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-11 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-11 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-12 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-12 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-13 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-13 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-14 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-14 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-15 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-15 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-16 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-16 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-17 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-17 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-18 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-18 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-19 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-19 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-20 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-20 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-21 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-21 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-22 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-22 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-23 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-23 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-24 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-24 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-25 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-25 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-26 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-26 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-27 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-27 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-28 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-28 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-29 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-29 .value {
+  color:#ffffff;
+}
+.dark .sr-stat-30 {
+  background:var(--surface);
+  border-color:var(--line);
+}
+.dark .sr-stat-30 .value {
+  color:#ffffff;
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="splash" id="splash"><div class="logo-word">Step<span>Roller</span></div></div>
+
+  <section class="screen active" id="homeScreen">
+    <div class="top">
+      <button class="profile-mini" id="topProfileBtn">
+        <div class="avatar" id="topAvatar">G</div>
+        <div class="name-badge" id="topName">Guest</div>
+      </button>
+      <div class="cup-pill"><svg class="cup-icon" viewBox="0 0 24 24" fill="none"><path d="M6 4h11v8.5A5.5 5.5 0 0 1 11.5 18h0A5.5 5.5 0 0 1 6 12.5V4Z" stroke="currentColor" stroke-width="1.8"/><path d="M17 7h1.5A2.5 2.5 0 0 1 21 9.5v.3a2.5 2.5 0 0 1-2.5 2.5H17M8 21h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span id="cups">0</span></div>
+    </div>
+    <div class="hero">
+      <div class="eyebrow">Run mode</div>
+      <h1>Move a little. Count every step.</h1>
+      <p>Motion-aware step tracking with a clean sporty dashboard.</p>
+      <div class="step-ring" id="stepRing">
+        <div class="step-core">
+          <div class="steps" id="steps">0</div><div class="step-label">steps</div>
+        </div>
+      </div>
+      <div class="distance" id="distance">0.0 km</div>
+      <div class="running"><span>Runnn</span></div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat"><button data-history="daily"><div class="t">Daily</div><div class="v" id="dailyStat">0</div></button></div>
+      <div class="stat"><button data-history="weekly"><div class="t">Weekly</div><div class="v" id="weeklyStat">0</div></button></div>
+      <div class="stat"><button data-history="monthly"><div class="t">Monthly</div><div class="v" id="monthlyStat">0</div></button></div>
+      <div class="stat"><button data-history="total"><div class="t">Total</div><div class="v" id="totalStat">0</div></button></div>
+    </div>
+
+    <div class="section-title"><h2>Daily login</h2><small>1 claim / 24h</small></div>
+    <div class="reward-grid" id="rewardGrid"></div>
+
+    <div class="section-title"><h2>Sunday Event</h2><small id="sundayStatus">Locked</small></div>
+    <div class="event-card" id="sundayCard"></div>
+  </section>
+
+  <section class="screen" id="chartScreen">
+    <div class="page-title">Leaderboard</div>
+    <div class="page-sub">Live global rankings from registered StepRoller profiles.</div>
+    <div class="tabs"><button class="tab active" data-board="daily">Daily</button><button class="tab" data-board="weekly">Weekly</button><button class="tab" data-board="monthly">Monthly</button></div>
+    <div class="panel" id="leaderboard"></div>
+  </section>
+
+  <section class="screen" id="profileScreen">
+    <div class="profile-head">
+      <div class="profile-big" id="profileBig">G</div>
+      <div class="profile-name" id="profileName">Guest</div>
+      <div class="profile-meta" id="profileRole">Not registered</div>
+      <div class="profile-stats">
+        <div class="mini-stat"><b id="profileDistance">0.0 km</b><span>Distance</span></div>
+        <div class="mini-stat"><b id="profileHours">0h</b><span>App time</span></div>
+        <div class="mini-stat"><b id="profileCups">0</b><span>Cups</span></div>
+      </div>
+    </div>
+    <div class="menu-list">
+      <button class="menu-btn" id="registerBtn"><span id="registerLabel">Register / Sign In</span><span>›</span></button>
+      <button class="menu-btn" id="changeNameBtn"><span>Change Name</span><span>100 cups</span></button>
+      <button class="menu-btn" onclick="openSettings()"><span>Settings</span><span>›</span></button>
+      <button class="menu-btn" onclick="openFeedback()"><span>Feedback</span><span>›</span></button>
+      <button class="menu-btn" onclick="openSubscription()"><span>Subscription</span><span>›</span></button>
+      <button class="menu-btn" id="logoutBtn"><span>Log out</span><span>›</span></button>
+    </div>
+  </section>
+
+  <section class="screen overlay-page" id="authScreen">
+    <button class="back" onclick="showScreen('profileScreen')">← Back</button>
+    <div class="panel auth-card">
+      <div class="auth-title">Create or access your profile</div>
+      <div class="auth-note">Use your first name and surname to register or sign in. Returning with the same name restores your saved score.</div>
+      <div class="form">
+        <input class="input" id="firstName" placeholder="First Name" autocomplete="given-name">
+        <input class="input" id="surname" placeholder="Surname" autocomplete="family-name">
+        <button class="primary" id="authAction">Register</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen overlay-page" id="settingsScreen">
+    <button class="back" onclick="showScreen('profileScreen')">← Back</button>
+    <div class="page-title">Settings</div>
+    <div class="page-sub">Control appearance, permissions and app usage data.</div>
+    <div class="settings-section">
+      <h3>Theme</h3>
+      <div class="choice-row"><button class="choice" id="defaultTheme">Default</button><button class="choice" id="darkTheme">Dark</button></div>
+      <h3>Account Details</h3>
+      <div class="panel" id="accountDetails"></div>
+      <h3>Device Permissions</h3>
+      <div class="panel">
+        <div class="permission-row"><span>Motion Sensor</span><strong style="color:#1688ff">Always Active</strong></div>
+        <div class="permission-row"><span>Notifications</span><button class="toggle" id="notifyToggle"><i></i></button></div>
+      </div>
+      <h3>Data Uses & Screen Time</h3>
+      <div class="panel">
+        <div class="data-row"><span>Data used</span><strong id="dataUsed">0 KB</strong></div>
+        <div class="data-row"><span>Screen time</span><strong id="screenTime">0 min</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen overlay-page" id="subscriptionScreen">
+    <button class="back" onclick="showScreen('profileScreen')">← Back</button>
+    <div class="page-title">Subscriptions</div>
+    <div class="page-sub">One active subscription at a time.</div>
+    <div class="billing-grid">
+      <div class="plan">
+        <h3>Lite <span class="badge-lite">VIPL</span></h3>
+        <div class="price" id="litePrice">₹99</div>
+        <ul><li>✓ Skip ads</li><li>✓ No Naration</li><li>✓ Lite Badge</li><li>✓ 30 Days Available</li></ul>
+        <button class="subscribe" id="liteBtn">Free</button>
+      </div>
+      <div class="plan">
+        <h3>Advance <span class="badge-advance">VIPP</span></h3>
+        <div class="price" id="advancePrice">₹299</div>
+        <ul><li>✓ No Ads</li><li>✓ No Naration</li><li>✓ Premium accounting</li><li>✓ Advance Badge</li><li>✓ Permanent</li></ul>
+        <button class="subscribe" id="advanceBtn">Free</button>
+      </div>
+    </div>
+    <div class="owner-panel" id="subscriptionNote">Owner accounts can claim both subscriptions for ₹0.</div>
+  </section>
+
+  <section class="screen overlay-page" id="feedbackScreen">
+    <button class="back" onclick="showScreen('profileScreen')">← Back</button>
+    <div class="page-title">Feedback</div>
+    <div class="panel">
+      <h3 style="margin-top:0">Write Feedback</h3>
+      <textarea class="textarea" id="feedbackText" placeholder="Tell us what you think..."></textarea>
+      <button class="primary" style="margin-top:10px;width:100%" id="sendFeedback">Send Feedback</button>
+    </div>
+  </section>
+
+  <section class="screen overlay-page" id="eventScreen">
+    <button class="back" onclick="showScreen('homeScreen')">← Back</button>
+    <div class="page-title">Sunday Event</div>
+    <div class="page-sub">One mission for the full event day.</div>
+    <div class="event-card">
+      <h3>Complete 100,000 steps</h3>
+      <p>All app step counts contribute to the mission. Claim 1,500 cups after completion.</p>
+      <div class="event-row"><span id="eventProgressText">0 / 100,000</span><span>1,500 cups</span></div>
+      <div class="progress"><div class="bar" id="eventBar"></div></div>
+      <button class="claim" id="eventClaim" style="margin-top:14px" disabled>Claim Reward</button>
+    </div>
+  </section>
+
+  <section class="screen overlay-page" id="winterScreen">
+    <button class="back" onclick="showScreen('homeScreen')">← Back</button>
+    <div class="page-title">Winter Arc</div>
+    <div class="page-sub" id="winterAccess"></div>
+    <div class="arc-grid" id="winterTasks"></div>
+  </section>
+
+  <div class="bottom-nav">
+    <button class="nav-btn active" data-screen="homeScreen"><span class="icon">⌂</span>Home</button>
+    <button class="nav-btn" data-screen="chartScreen"><span class="icon">◒</span>Chart</button>
+    <button class="nav-btn" data-screen="profileScreen"><span class="icon">◯</span>Profile</button>
+    <button class="nav-btn" id="eventNav"><span class="icon">✦</span>Event</button>
+    <button class="nav-btn" id="winterNav" style="display:none"><span class="icon">✧</span>Winter Arc</button>
+  </div>
+
+  <div class="offline-gate" id="offlineGate" aria-live="polite">
+    <div class="offline-mark" aria-hidden="true"></div>
+    <strong>Step Roller</strong>
+    <span>Connect to the internet to open StepRoller. Step tracking can continue in the native background service.</span>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="feedback-wrap" id="feedbackOverlay">
+    <div class="feedback">
+      <h3>Write Feedback</h3>
+      <textarea class="textarea" id="overlayFeedback" placeholder="Write feedback here..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="secondary" style="flex:1" onclick="closeFeedback()">Cancel</button>
+        <button class="primary" style="flex:1" id="overlaySend">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const OWNER_NAMES = [
+  "harshad wadekar",
+  "ishwaree kadam",
+  "aryan kamble",
+  "priyansh thakur",
+  "naitik gupta",
+  "arnav tuntune"
+];
+const PARTNER_NAMES = [
+  "adesh daki",
+  "shivam dahatonde",
+  "daksh shinde",
+  "dhruv kadam",
+  "mayank tamboli"
+];
+const state = {
+  profiles: JSON.parse(localStorage.getItem("sr_profiles") || "{}"),
+  activeKey: localStorage.getItem("sr_active") || "",
+  theme: localStorage.getItem("sr_theme") || "default",
+  screenOpenStart: Date.now(),
+  totalScreenMs: Number(localStorage.getItem("sr_screen_ms") || 0),
+  motionEnabled: true,
+  motionPermissionRequested: false,
+  notificationEnabled: false,
+  winterTimers: {
+  }
+  ,
+  currentBoard: "daily"
+}
+;
+function keyFor(first,last){
+  return (first.trim()+" "+last.trim()).toLowerCase().replace(/\s+/g," ");
+}
+function titleCase(s){
+  return s.split(" ").map(x=>x?x[0].toUpperCase()+x.slice(1).toLowerCase():"").join(" ");
+}
+function initials(name){
+  return name.split(" ").filter(Boolean).slice(0,2).map(x=>x[0].toUpperCase()).join("") || "G";
+}
+function todayKey(date = new Date()) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+function daysSince(dateStr){
+  return Math.max(1, Math.floor((Date.now()-new Date(dateStr).getTime())/86400000)+1);
+}
+function profile(){
+  return state.profiles[state.activeKey] || null;
+}
+function saveAll(){
+  const serialized = JSON.stringify(state.profiles);
+  localStorage.setItem("sr_profiles", serialized);
+  localStorage.setItem("sr_active", state.activeKey);
+  try {
+    srWriteJson(SR_STORAGE.profiles, state.profiles);
+    localStorage.setItem(SR_STORAGE.active, state.activeKey);
+  } catch (error) {
+    console.warn("Profile persistence fell back to legacy storage", error);
+  }
+  scheduleBackendSync();
+}
+const API_BASE = (() => {
+  try {
+    const nativeBase = window.StepRollerNative?.getApiBaseUrl?.();
+    return `${nativeBase ? String(nativeBase).replace(/\/$/, "") : ""}/api`;
+  } catch (error) {
+    return "/api";
+  }
+})();
+let backendOnline = false;
+let backendSyncTimer = null;
+async function apiRequest(path, options={
+}
+){
+  try{
+    const res=await fetch(API_BASE+path,{
+      headers:{
+        "Content-Type":"application/json",...(options.headers||{
+        }
+        )
+      }
+      ,...options
+    }
+    );
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  }
+  catch(e){
+    return null;
+  }
+}
+function profilePayload(p){
+  return p ? JSON.parse(JSON.stringify(p)) : null;
+}
+function profilePayloadForBackend(p) {
+  const payload = profilePayload(p);
+  if (!payload || !window.StepRollerNative) return payload;
+  // Native step deltas are sent by the foreground service; don't replay their counters as an absolute profile update.
+  ["steps", "stepDayKey", "lifetimeSteps", "daySteps", "weekSteps", "monthSteps", "motionSteps"].forEach(key => delete payload[key]);
+  return payload;
+}
+async function checkBackend(){
+  const data=await apiRequest("/health");
+  backendOnline=!!(data&&data.ok);
+  if(backendOnline && profile()) await syncProfileToBackend();
+  if(backendOnline) renderLeaderboard();
+}
+function scheduleBackendSync(){
+  if(!backendOnline || !profile()) return;
+  clearTimeout(backendSyncTimer);
+  backendSyncTimer=setTimeout(()=>syncProfileToBackend(),180);
+}
+async function syncProfileToBackend(){
+  const p=profile();
+  if(!backendOnline || !p) return;
+  await apiRequest("/sync",{
+    method:"POST",body:JSON.stringify({
+      profile:profilePayloadForBackend(p)
+    }
+    )
+  }
+  );
+}
+async function renameProfileOnBackend(oldKey,p){
+  if(!backendOnline || !p) return;
+  await apiRequest("/rename",{
+    method:"POST",body:JSON.stringify({
+      oldKey,profile:profilePayloadForBackend(p)
+    }
+    )
+  }
+  );
+}
+async function syncFeedbackToBackend(p,text){
+  if(!backendOnline || !p || !text) return;
+  await apiRequest("/feedback",{
+    method:"POST",body:JSON.stringify({
+      profileKey:state.activeKey,name:p.name,text,at:Date.now()
+    }
+    )
+  }
+  );
+}
+function roleFor(name){
+  const n=name.toLowerCase();
+  if(OWNER_NAMES.includes(n)) return "owner";
+  if(PARTNER_NAMES.includes(n)) return "partner";
+  return "bronze";
+}
+function createProfile(name){
+  const role=roleFor(name);
+  const p={
+    name, role, createdAt:new Date().toISOString(), steps:0, cups:0, lifetimeSteps:0,
+    daySteps:{
+    }
+    , weekSteps:{
+    }
+    , monthSteps:{
+    }
+    , loginDay:0, lastLogin:null, loginClaimAt:0,
+    subscription:null, subscriptionUntil:null, feedbacks:[], dataBytes:0
+  }
+  ;
+  state.profiles[keyFor(...name.split(" "))]=p;
+  state.activeKey=keyFor(...name.split(" "));
+  applyLoginReward(p);
+  saveAll();
+  return p;
+}
+function applyLoginReward(p){
+  const now=Date.now();
+  if(!p.lastLogin || now - p.lastLogin >= 86400000){
+    p.loginDay = p.loginDay>=7 ? 1 : p.loginDay+1;
+    p.lastLogin = now;
+  }
+}
+function claimLogin(day){
+  const p=profile();
+  if(!p) return toast("Register your profile first.");
+  if(Date.now()-p.loginClaimAt<86400000) return toast("Next daily claim unlocks after 24 hours.");
+  const rewards=[3,6,9,12,15,18,21];
+  const amount=rewards[day-1]||3;
+  p.cups += amount;
+  p.loginClaimAt=Date.now();
+  p.dataBytes += 500;
+  saveAll();
+  render();
+  syncProfileToBackend();
+  toast(`Day ${day} claimed • +${amount} cups`);
+}
+function stepIncrements(){
+  const p=profile();
+  if(!p) return;
+  const now=new Date(), day=todayKey();
+  const week = getWeekKey(now), month = getMonthKey(now);
+  p.steps += 1;
+  p.lifetimeSteps += 1;
+  p.daySteps[day]=(p.daySteps[day]||0)+1;
+  p.weekSteps[week]=(p.weekSteps[week]||0)+1;
+  p.monthSteps[month]=(p.monthSteps[month]||0)+1;
+  const old100=Math.floor((p.lifetimeSteps-1)/100), new100=Math.floor(p.lifetimeSteps/100);
+  if(new100>old100) p.cups += 5;
+  p.dataBytes += 80;
+  saveAll();
+  render();
+  scheduleBackendSync();
+}
+function getWeekKey(d = new Date()) {
+  return srMondayKey(d.getTime());
+}
+function getMonthKey(d){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+}
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("active",s.id===id));
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.screen===id));
+  if(id==="chartScreen") renderLeaderboard();
+}
+function render(){
+  const p=profile(), guest=!p;
+  if (p) srEnsureLocalDay(p);
+  if(p) applyLoginReward(p);
+  document.getElementById("topAvatar").textContent=guest?"G":initials(p.name);
+  document.getElementById("topName").innerHTML=guest?"Guest":escapeHtml(p.name)+tickHtml(p.role)+(p.subscription?badgeHtml(p.subscription):"");
+  document.getElementById("cups").textContent=guest?"0":p.cups.toLocaleString();
+  document.getElementById("steps").textContent=guest?"0":p.steps.toLocaleString();
+  const km=guest?0:p.steps/1000;
+  document.getElementById("distance").textContent=km.toFixed(1)+" km";
+  document.getElementById("stepRing").style.setProperty("--progress",Math.min(100,(p?p.steps%10000:0)/100)+"%");
+  document.getElementById("dailyStat").textContent=guest?"0":(p.daySteps[todayKey()]||0).toLocaleString();
+  document.getElementById("weeklyStat").textContent=guest?"0":(p.weekSteps[getWeekKey(new Date())]||0).toLocaleString();
+  document.getElementById("monthlyStat").textContent=guest?"0":(p.monthSteps[getMonthKey(new Date())]||0).toLocaleString();
+  document.getElementById("totalStat").textContent=guest?"0":p.lifetimeSteps.toLocaleString();
+  document.getElementById("profileBig").textContent=guest?"G":initials(p.name);
+  document.getElementById("profileName").innerHTML=guest?"Guest":escapeHtml(p.name)+tickHtml(p.role)+(p.subscription?badgeHtml(p.subscription):"");
+  document.getElementById("profileRole").textContent=guest?"Not registered":`${titleCase(p.role)} profile • ${daysSince(p.createdAt)} day${daysSince(p.createdAt)>1?"s":""} using StepRoller`;
+  document.getElementById("profileDistance").textContent=km.toFixed(1)+" km";
+  document.getElementById("profileHours").textContent=Math.floor(state.totalScreenMs/3600000)+"h "+Math.floor((state.totalScreenMs%3600000)/60000)+"m";
+  document.getElementById("profileCups").textContent=guest?"0":p.cups.toLocaleString();
+  document.getElementById("registerLabel").textContent=guest?"Register / Sign In":"Registered";
+  document.getElementById("changeNameBtn").style.display=guest?"none":"flex";
+  document.getElementById("logoutBtn").style.display=guest?"none":"flex";
+  renderRewards();
+  renderSunday();
+  renderWinterNav();
+  renderSettings();
+  renderSubscriptions();
+}
+function tickHtml(role){
+  if(role==="owner") return '<span class="verified owner">✓</span>';
+  if(role==="partner") return '<span class="verified partner">✓</span>';
+  return '<span class="verified bronze">✓</span>';
+}
+function badgeHtml(sub){
+  return sub==="lite"?'<span class="badge-lite">VIPL</span>':'<span class="badge-advance">VIPP</span>'
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, (m) => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  }[m]));
+}
+
+function renderRewards(){
+  const holder=document.getElementById("rewardGrid"); holder.innerHTML="";
+  const p=profile(), current=p?p.loginDay:1;
+  const rewards=[3,6,9,12,15,18,21];
+  for(let i=1;i<=7;i++){
+    const card=document.createElement("div"); card.className="reward-card";
+    const locked=!p || i!==current || (p && Date.now()-p.loginClaimAt<86400000);
+    card.innerHTML=`<div class="reward-day">Day ${i}</div><div class="reward-cups">${rewards[i-1]} cups</div><button class="claim" ${locked?"disabled":""}>${!p?"Login required":(i===current?"Claim":"Locked")}</button>`;
+    card.querySelector("button").onclick=()=>claimLogin(i); holder.appendChild(card);
+  }
+}
+
+function historyList(kind){
+  const p=profile(); if(!p) return '<div class="empty">Register a profile to view your history.</div>';
+  let obj=p.daySteps, title="Daily";
+  if(kind==="weekly"){obj=p.weekSteps;title="Weekly";}
+  if(kind==="monthly"){obj=p.monthSteps;title="Monthly";}
+  if(kind==="total") return `<div class="history-row"><strong>Total lifetime</strong><span>${p.lifetimeSteps.toLocaleString()} steps</span></div>`;
+  const rows=Object.entries(obj).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,14);
+  if(!rows.length) return '<div class="empty">No history yet.</div>';
+  return rows.map(([k,v],i)=>`<div class="history-row"><strong>${title} ${rows.length-i} · ${k}</strong><span>${v.toLocaleString()}</span></div>`).join("");
+}
+document.querySelectorAll("[data-history]").forEach(b=>b.addEventListener("click",e=>{
+  const kind=e.currentTarget.dataset.history;
+  document.getElementById("leaderboard").innerHTML=`<div class="section-title" style="margin-top:0"><h2>${kind[0].toUpperCase()+kind.slice(1)} history</h2></div>${historyList(kind)}`;
+  showScreen("chartScreen");
+}));
+
+async function renderLeaderboard(){
+  const kind=state.currentBoard;
+  if(backendOnline){
+    const data=await apiRequest(`/leaderboard?board=${encodeURIComponent(kind)}`);
+    if(data && Array.isArray(data.rows)){ renderLeaderboardRows(data.rows, kind); return; }
+  }
+  const rows=Object.values(state.profiles);
+  const box=document.getElementById("leaderboard");
+  if(kind==="weekly"){
+    const eligible=rows.filter(p=>daysSince(p.createdAt)>7);
+    if(!eligible.length){box.innerHTML='<div class="empty">No DATA Found</div>';return}
+    rows.splice(0,rows.length,...eligible);
+  }
+  if(kind==="monthly"){
+    const eligible=rows.filter(p=>daysSince(p.createdAt)>30);
+    if(!eligible.length){box.innerHTML='<div class="empty">No DATA Found</div>';return}
+    rows.splice(0,rows.length,...eligible);
+  }
+  rows.sort((a,b)=>{
+    const scoreA=kind==="daily"?(a.daySteps[todayKey()]||0):kind==="weekly"?(a.weekSteps[getWeekKey(new Date())]||0):(a.monthSteps[getMonthKey(new Date())]||0);
+    const scoreB=kind==="daily"?(b.daySteps[todayKey()]||0):kind==="weekly"?(b.weekSteps[getWeekKey(new Date())]||0):(b.monthSteps[getMonthKey(new Date())]||0);
+    return scoreB-scoreA;
+  });
+  box.innerHTML=rows.length?rows.map((p,i)=>{
+    const score=kind==="daily"?(p.daySteps[todayKey()]||0):kind==="weekly"?(p.weekSteps[getWeekKey(new Date())]||0):(p.monthSteps[getMonthKey(new Date())]||0);
+    return `<div class="leader-row"><div class="rank">${i+1}</div><div class="person"><div class="avatar" style="width:34px;
+  height:34px">${initials(p.name)}</div><div class="meta"><strong>${escapeHtml(p.name)}${tickHtml(p.role)}</strong><small>${titleCase(p.role)}</small></div></div><div class="leader-steps">${score.toLocaleString()}</div></div>`
+  }).join(""):'<div class="empty">No registered profiles found.</div>';
+}
+function renderLeaderboardRows(rows, kind){
+  const box=document.getElementById("leaderboard");
+  if(!rows.length){box.innerHTML=(kind==="weekly"||kind==="monthly")?'<div class="empty">No DATA Found</div>':'<div class="empty">No registered profiles found.</div>';return;}
+  box.innerHTML=rows.map((p,i)=>`<div class="leader-row"><div class="rank">${i+1}</div><div class="person"><div class="avatar" style="width:34px;
+  height:34px">${initials(p.name)}</div><div class="meta"><strong>${escapeHtml(p.name)}${tickHtml(p.role)}</strong><small>${titleCase(p.role)}</small></div></div><div class="leader-steps">${Number(p.score||0).toLocaleString()}</div></div>`).join("");
+}
+document.querySelectorAll("[data-board]").forEach(b=>b.addEventListener("click",e=>{
+  document.querySelectorAll("[data-board]").forEach(x=>x.classList.remove("active")); e.currentTarget.classList.add("active"); state.currentBoard=e.currentTarget.dataset.board; renderLeaderboard();
+}));
+
+function renderSunday(){
+  const sunday=new Date(); const isSunday=sunday.getDay()===0;
+  const nav=document.getElementById("eventNav"); nav.classList.toggle("locked",!isSunday);
+  document.getElementById("sundayStatus").textContent=isSunday?"Live":"Locked";
+  document.getElementById("sundayCard").innerHTML=isSunday?`<h3>100,000 Step Mission</h3><p>Today's event is live. Open Event to track progress.</p><button class="claim" onclick="showScreen('eventScreen')">Open Event</button>`:`<div><h3>Locked</h3><p>The Sunday Event unlocks on Sunday.</p></div>`;
+}
+function renderEvent(){
+  const p=profile(); const val=Math.min(100000,p?p.steps:0); const done=val>=100000;
+  document.getElementById("eventProgressText").textContent=`${val.toLocaleString()} / 100,000`;
+  document.getElementById("eventBar").style.width=(val/1000)+"%";
+  document.getElementById("eventClaim").disabled=!done;
+  document.getElementById("eventClaim").onclick=()=>{if(!profile())return; profile().cups+=1500; saveAll(); render(); syncProfileToBackend(); toast("Event reward claimed • +1,500 cups")};
+}
+function renderWinterNav(){
+  const btn=document.getElementById("winterNav"); const p=profile(); const role=p?p.role:"bronze";
+  const now=new Date(); const y=now.getFullYear();
+  const oct=new Date(y,9,1), decEnd=new Date(y,11,31,23,59,59);
+  const ownerEarly=new Date(y,8,21); // 10 days before Oct 1
+  const visible=now>=oct && now<=decEnd;
+  const ownerEarlyVisible=role==="owner" && now>=ownerEarly && now<oct;
+  const shouldShow=visible||ownerEarlyVisible;
+  btn.style.display=shouldShow?"block":"none";
+}
+function winterAvailable(){const now=new Date(), y=now.getFullYear(), start=new Date(y,9,1), end=new Date(y,11,31,23,59,59); if(now>=start&&now<=end)return true; const p=profile(); return p?.role==="owner" && now>=new Date(y,8,21)&&now<start}
+function renderWinter(){
+  const available=winterAvailable();
+  document.getElementById("winterAccess").textContent=available?"Season active • October–December":"Locked until Winter Arc access date.";
+  const holder=document.getElementById("winterTasks");
+  const tasks=[["10 km Running","1 hr","470"],["20 km Running","2 hr","850"],["Minimum Run","30 min","220"],["Winter Endurance","4 km","180"]];
+  holder.innerHTML=tasks.map((t,i)=>`<div class="winter-task"><div style="display:flex;
+  justify-content:space-between;
+  align-items:center"><h4>${t[0]}</h4><span class="lock-chip">${available?"READY":"LOCKED"}</span></div><p>Complete within the shown timer/target. Offline elapsed time is tracked while this page is open.</p><div class="timer" id="timer${
+    i
+  }
+  ">${t[1]}</div><button class="primary" style="width:100%" ${available?"":"disabled"} onclick="startArc(${
+    i
+  }
+  )">Start the ARC</button><div style="margin-top:10px;
+  color:#6e7d95;
+  font-size:10px;
+  font-weight:900">Reward · ${t[2]} cups</div></div>`).join("");
+}
+function startArc(i){
+  const p=profile(); if(!p)return toast("Register a profile first.");
+  const durations=[3600,7200,1800,1800]; let left=durations[i];
+  if(state.winterTimers[i]) return;
+  state.winterTimers[i]=setInterval(()=>{left--; const el=document.getElementById("timer"+i); if(el){const h=Math.floor(left/3600),m=Math.floor((left%3600)/60),s=left%60; el.textContent=`${h?String(h).padStart(2,"0")+":":""}${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;} if(left<=0){clearInterval(state.winterTimers[i]);state.winterTimers[i]=null;toast("ARC timer completed.");}},1000);
+  toast("Winter ARC started.");
+}
+
+function openSettings(){showScreen("settingsScreen");renderSettings()}
+function renderSettings(){
+  document.getElementById("defaultTheme").classList.toggle("selected",state.theme==="default");
+  document.getElementById("darkTheme").classList.toggle("selected",state.theme==="dark");
+  const p=profile();
+  document.getElementById("accountDetails").innerHTML=p?`<div class="data-row"><span>Name</span><strong>${escapeHtml(p.name)}</strong></div><div class="data-row"><span>Using app</span><strong>${daysSince(p.createdAt)} day${daysSince(p.createdAt)>1?"s":""}</strong></div><div class="data-row"><span>Distance</span><strong>${(p.steps/1000).toFixed(1)} km</strong></div><div class="data-row"><span>Steps</span><strong>${p.lifetimeSteps.toLocaleString()}</strong></div>`:'<div class="empty">No account registered.</div>';
+  document.getElementById("dataUsed").textContent=p?formatBytes(p.dataBytes):"0 KB";
+  document.getElementById("screenTime").textContent=formatMs(state.totalScreenMs);
+  document.getElementById("notifyToggle").classList.toggle("on",state.notificationEnabled);
+}
+function formatBytes(n){return n<1024?n+" B":n<1024*1024?(n/1024).toFixed(1)+" KB":(n/1024/1024).toFixed(1)+" MB"}
+function formatMs(n){return Math.floor(n/60000)+" min"}
+
+function openSubscription(){showScreen("subscriptionScreen");renderSubscriptions()}
+function renderSubscriptions(){
+  const p=profile(), owner=p?.role==="owner";
+  document.getElementById("litePrice").textContent=owner?"₹0":"₹99";
+  document.getElementById("advancePrice").textContent=owner?"₹0":"₹299";
+  document.getElementById("liteBtn").textContent=p?.subscription==="lite"?"Claimed":"Free";
+  document.getElementById("advanceBtn").textContent=p?.subscription==="advance"?"Claimed":"Free";
+  document.getElementById("liteBtn").classList.toggle("claimed",p?.subscription==="lite");
+  document.getElementById("advanceBtn").classList.toggle("claimed",p?.subscription==="advance");
+  document.getElementById("liteBtn").onclick=()=>claimSub("lite");
+  document.getElementById("advanceBtn").onclick=()=>claimSub("advance");
+}
+function claimSub(type){
+  const p=profile(); if(!p)return toast("Register a profile first.");
+  if(p.subscription===type)return;
+  p.subscription=type; p.subscriptionUntil=type==="lite"?Date.now()+30*86400000:null; saveAll(); render(); syncProfileToBackend(); toast(`${type==="lite"?"Lite":"Advance"} subscription claimed.`);
+}
+
+function openFeedback(){document.getElementById("feedbackOverlay").classList.add("show")}
+function closeFeedback(){document.getElementById("feedbackOverlay").classList.remove("show")}
+document.getElementById("sendFeedback").onclick=async()=>{const p=profile();const t=document.getElementById("feedbackText").value.trim(); if(!t)return toast("Write feedback first."); if(p){p.feedbacks.push({text:t,at:Date.now()});saveAll();await syncFeedbackToBackend(p,t)} document.getElementById("feedbackText").value=""; toast("Feedback saved."); showScreen("profileScreen")};
+document.getElementById("overlaySend").onclick=async()=>{const p=profile(),t=document.getElementById("overlayFeedback").value.trim(); if(!t)return toast("Write feedback first."); if(p){p.feedbacks.push({text:t,at:Date.now()});saveAll();await syncFeedbackToBackend(p,t)} document.getElementById("overlayFeedback").value=""; closeFeedback(); toast("Feedback saved.")};
+
+document.getElementById("registerBtn").onclick=()=>showScreen("authScreen");
+document.getElementById("authAction").onclick=async()=>{
+  const first=document.getElementById("firstName").value.trim(), last=document.getElementById("surname").value.trim();
+  if(!first||!last)return toast("First name and surname are required.");
+  const name=titleCase(first+" "+last), key=keyFor(first,last);
+  if(!state.profiles[key]) state.profiles[key]=createBlankProfile(name);
+  const local=state.profiles[key];
+  const data=await apiRequest("/auth",{method:"POST",body:JSON.stringify({key,name,profile:profilePayloadForBackend(local)})});
+  if(data && data.profile) state.profiles[key]=data.profile;
+  state.activeKey=key;
+  srEnsureLocalDay(state.profiles[key]);
+  applyLoginReward(state.profiles[key]);
+  saveAll();
+  await syncProfileToBackend();
+  srStartNativeTracking(state.profiles[key].name);
+  render();
+  showScreen("profileScreen");
+  toast("Profile registered.");
+};
+function createBlankProfile(name){const role=roleFor(name); return {name,role,createdAt:new Date().toISOString(),steps:0,stepDayKey:srIsoDay(),cups:0,lifetimeSteps:0,stepCupMilestoneCups:0,daySteps:{},weekSteps:{},monthSteps:{},loginDay:1,lastLogin:Date.now(),loginClaimAt:0,subscription:null,subscriptionUntil:null,feedbacks:[],dataBytes:0}}
+document.getElementById("changeNameBtn").onclick=async()=>{
+  const p=profile(); if(!p)return;
+  const first=prompt("New First Name"), last=prompt("New Surname"); if(!first||!last)return;
+  if(p.cups<100)return toast("100 cups are required to change name.");
+  p.cups-=100;
+  const newName=titleCase(first.trim()+" "+last.trim()), newKey=keyFor(first.trim(),last.trim());
+  const oldRole=p.role; const oldKey=state.activeKey; p.name=newName; p.role=roleFor(newName);
+  delete state.profiles[oldKey]; state.profiles[newKey]=p; state.activeKey=newKey; saveAll(); srStartNativeTracking(newName); await renameProfileOnBackend(oldKey,p); render();
+  toast(p.role!==oldRole?"Name changed • badge updated":"Name changed • 100 cups used");
+};
+document.getElementById("logoutBtn").onclick=()=>{
+  if(!profile())return;
+  state.activeKey="";
+  saveAll();
+  srStartNativeTracking("");
+  render();
+  showScreen("homeScreen");
+  toast("Logged out.");
+};
+
+document.getElementById("defaultTheme").onclick=()=>setTheme("default");
+document.getElementById("darkTheme").onclick=()=>setTheme("dark");
+function setTheme(t){state.theme=t;document.documentElement.classList.toggle("dark",t==="dark");localStorage.setItem("sr_theme",t);renderSettings();toast(`${t==="dark"?"Dark":"Default"} theme enabled`)}
+
+document.getElementById("topProfileBtn").onclick=()=>showScreen("profileScreen");
+document.querySelectorAll(".nav-btn[data-screen]").forEach(b=>b.onclick=()=>showScreen(b.dataset.screen));
+document.getElementById("eventNav").onclick=()=>{if(new Date().getDay()!==0)return toast("Sunday Event is locked."); renderEvent(); showScreen("eventScreen")};
+document.getElementById("winterNav").onclick=()=>{renderWinter(); showScreen("winterScreen")};
+async function requestMotionAccess(){
+  if (window.StepRollerNative) return;
+  if(state.motionPermissionRequested) return;
+  state.motionPermissionRequested=true;
+  if(typeof DeviceMotionEvent!=="undefined" && typeof DeviceMotionEvent.requestPermission==="function"){
+    try{ await DeviceMotionEvent.requestPermission(); }catch(e){}
+  }
+}
+window.addEventListener("pointerdown",requestMotionAccess,{once:true});
+window.addEventListener("touchstart",requestMotionAccess,{once:true,passive:true});
+document.getElementById("notifyToggle").onclick=async()=>{
+  if(!("Notification" in window)) return toast("Notifications are not supported in this browser.");
+  try{const r=await Notification.requestPermission(); if(r==="granted"){state.notificationEnabled=true; renderSettings(); toast("Notifications enabled")}else toast("Notification permission not granted.")}catch(e){toast("Notification setup unavailable.")}
+};
+
+let lastMotion=0, motionScore=0;
+window.addEventListener("devicemotion",()=>{});
+window.addEventListener("keydown",e=>{if(e.key.toLowerCase()==="s")stepIncrements()}); // preview shortcut
+window.addEventListener("online",()=>toast("Connection restored."));
+window.addEventListener("offline",()=>toast("Offline • local motion counting can continue."));
+setInterval(()=>{ if(document.visibilityState==="visible"){state.totalScreenMs+=1000;localStorage.setItem("sr_screen_ms",state.totalScreenMs)} },1000);
+
+function toast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),2000)}
+
+function morningNotification(){
+  if(!state.notificationEnabled || !("Notification" in window) || Notification.permission!=="granted")return;
+  const now=new Date(), target=new Date(now); target.setHours(5,0,0,0);
+  const key=target.toDateString();
+  if(now>=target && localStorage.getItem("sr_morning_"+key)!=="1"){
+    try{new Notification("StepRoller",{body:"Wake up and make yourself strong right now."});localStorage.setItem("sr_morning_"+key,"1")}catch(e){}
+  }
+}
+
+async function boot(){
+  document.documentElement.classList.toggle("dark",state.theme==="dark");
+  setTimeout(()=>document.getElementById("splash").classList.add("hide"),1700);
+  render(); renderWinter(); morningNotification();
+  await checkBackend();
+}
+window.addEventListener("beforeunload",()=>{state.totalScreenMs=Math.max(0,state.totalScreenMs);localStorage.setItem("sr_screen_ms",state.totalScreenMs)});
+
+/* ========================================================================== *
+   StepRoller Pro Layer
+   This layer strengthens the existing StepRoller feature set without changing
+   the requested visual language. It centralizes validation, persistence,
+   backend synchronization, seasonal rules and sensor safety checks.
+   ========================================================================== */
+
+const SR_PRO = {
+  version: "2.0.0",
+  buildName: "StepRoller Beta Professional",
+  schema: 7,
+  maxSyncQueue: 300,
+  maxHistoryRows: 60,
+  motion: {
+    sampleMinGapMs: 16,
+    baselineAlpha: 0.035,
+    signalAlpha: 0.22,
+    peakWindowMs: 1100,
+    peakCooldownMs: 320,
+    minDynamicSignal: 1.65,
+    maxDynamicSignal: 10.5,
+    minPeakCount: 2,
+    confidenceFloor: 0.18,
+    confidenceCeiling: 0.92
+  },
+  reward: {
+    dailyHours: 24,
+    cupsPerHundredSteps: 5,
+    renameCost: 100,
+    sundaySteps: 100000,
+    sundayCups: 1500
+  },
+  winter: {
+    earlyDay: 21,
+    startMonth: 9,
+    endMonth: 11,
+    endDay: 31
+  }
+};
+
+function srNow() {
+  return Date.now();
+}
+
+function srSafeNumber(value, fallback = 0) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  return parsed;
+}
+
+function srClamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function srArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function srObject(value) {
+  return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+}
+
+function srString(value, fallback = "") {
+  const text = String(value ?? "").trim();
+  return text || fallback;
+}
+
+function srNormalizeName(firstName, surname) {
+  const first = titleCase(srString(firstName));
+  const last = titleCase(srString(surname));
+  if (!first || !last) return "";
+  return `${first} ${last}`.replace(/\s+/g, " ").trim();
+}
+
+function srNameKey(name) {
+  return srString(name).toLowerCase().replace(/\s+/g, " ");
+}
+
+function srDeepClone(value) {
+  try {
+    return JSON.parse(JSON.stringify(value));
+  } catch (error) {
+    return null;
+  }
+}
+
+function srIsoDay(ts = srNow()) {
+  const date = new Date(ts);
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+/** Keeps the home ring scoped to the device's current calendar day. Historical maps are never cleared. */
+function srEnsureLocalDay(item, ts = srNow()) {
+  if (!item) return false;
+  const today = srIsoDay(ts);
+  if (item.stepDayKey === today) return false;
+  item.daySteps = srObject(item.daySteps);
+  item.steps = srSafeNumber(item.daySteps[today], 0);
+  item.stepDayKey = today;
+  item.updatedAt = new Date(ts).toISOString();
+  return true;
+}
+
+function srMonthKey(ts = srNow()) {
+  const date = new Date(ts);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function srMondayKey(ts = srNow()) {
+  const date = new Date(ts);
+  date.setHours(0, 0, 0, 0);
+  const day = date.getDay();
+  const delta = day === 0 ? -6 : 1 - day;
+  date.setDate(date.getDate() + delta);
+  return srIsoDay(date.getTime());
+}
+
+function srDaysSince(iso) {
+  const start = new Date(iso || srNow()).getTime();
+  if (!Number.isFinite(start)) return 1;
+  return Math.max(1, Math.floor((srNow() - start) / 86400000) + 1);
+}
+
+const SR_STORAGE = {
+  profiles: "sr_profiles_v7",
+  active: "sr_active_v7",
+  settings: "sr_settings_v7",
+  queue: "sr_queue_v7",
+  screen: "sr_screen_v7",
+  sensor: "sr_sensor_v7",
+  events: "sr_events_v7"
+};
+
+function srReadJson(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw);
+  } catch (error) {
+    return fallback;
+  }
+}
+
+function srWriteJson(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function srRemoveKey(key) {
+  try {
+    localStorage.removeItem(key);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function srEstimateBytes(value) {
+  try {
+    return new Blob([JSON.stringify(value)]).size;
+  } catch (error) {
+    return String(JSON.stringify(value)).length;
+  }
+}
+
+function srMigrateProfiles() {
+  const current = srReadJson(SR_STORAGE.profiles, null);
+  if (current && typeof current === "object") return current;
+  const legacy = srReadJson("sr_profiles", {});
+  const upgraded = {};
+  Object.entries(srObject(legacy)).forEach(([key, value]) => {
+    const item = srDeepClone(value) || {};
+    item.name = srString(item.name, key);
+    item.role = roleFor(item.name);
+    item.daySteps = srObject(item.daySteps);
+    item.weekSteps = srObject(item.weekSteps);
+    item.monthSteps = srObject(item.monthSteps);
+    item.feedbacks = srArray(item.feedbacks);
+    item.dataBytes = srSafeNumber(item.dataBytes, srEstimateBytes(item));
+    upgraded[srNameKey(item.name)] = item;
+  });
+  srWriteJson(SR_STORAGE.profiles, upgraded);
+  return upgraded;
+}
+
+function srHasName(profile) {
+  return Boolean(srString(profile?.name));
+}
+
+function srHasCreatedAt(profile) {
+  return Boolean(profile?.createdAt && Number.isFinite(new Date(profile.createdAt).getTime()));
+}
+
+function srHasSteps(profile) {
+  return srSafeNumber(profile?.lifetimeSteps) >= 0;
+}
+
+function srHasCups(profile) {
+  return srSafeNumber(profile?.cups) >= 0;
+}
+
+function srHasDailyHistory(profile) {
+  return Object.keys(srObject(profile?.daySteps)).length >= 0;
+}
+
+function srHasWeeklyHistory(profile) {
+  return Object.keys(srObject(profile?.weekSteps)).length >= 0;
+}
+
+function srHasMonthlyHistory(profile) {
+  return Object.keys(srObject(profile?.monthSteps)).length >= 0;
+}
+
+function srIsRegistered(profile) {
+  return Boolean(profile && srHasName(profile) && srHasCreatedAt(profile));
+}
+
+function srIsOwner(profile) {
+  return Boolean(profile && roleFor(profile.name) === "owner");
+}
+
+function srIsPartner(profile) {
+  return Boolean(profile && roleFor(profile.name) === "partner");
+}
+
+function srIsBronze(profile) {
+  return Boolean(profile && roleFor(profile.name) === "bronze");
+}
+
+function srNormalizeProfile(profile) {
+  const item = srObject(srDeepClone(profile) || {});
+  item.name = srString(item.name, "Guest");
+  item.role = roleFor(item.name);
+  item.createdAt = item.createdAt || new Date().toISOString();
+  item.steps = srSafeNumber(item.steps);
+  item.stepDayKey = srString(item.stepDayKey, "");
+  item.lifetimeSteps = srSafeNumber(item.lifetimeSteps);
+  item.stepCupMilestoneCups = srSafeNumber(item.stepCupMilestoneCups, Math.floor(item.lifetimeSteps / 100) * SR_PRO.reward.cupsPerHundredSteps);
+  item.cups = srSafeNumber(item.cups);
+  item.daySteps = srObject(item.daySteps);
+  item.weekSteps = srObject(item.weekSteps);
+  item.monthSteps = srObject(item.monthSteps);
+  srEnsureLocalDay(item);
+  item.feedbacks = srArray(item.feedbacks);
+  item.dataBytes = srEstimateBytes(item);
+  item.loginDay = Math.max(1, Math.min(7, srSafeNumber(item.loginDay, 1)));
+  item.loginClaimAt = srSafeNumber(item.loginClaimAt);
+  item.lastLogin = srSafeNumber(item.lastLogin);
+  item.subscription = ["lite", "advance"].includes(item.subscription) ? item.subscription : null;
+  item.subscriptionUntil = item.subscription === "lite" ? srSafeNumber(item.subscriptionUntil, 0) : null;
+  item.winterTasks = srObject(item.winterTasks);
+  item.eventClaims = srArray(item.eventClaims);
+  return item;
+}
+
+function srNormalizeAllProfiles() {
+  const all = srMigrateProfiles();
+  Object.keys(all).forEach((key) => {
+    all[key] = srNormalizeProfile(all[key]);
+  });
+  srWriteJson(SR_STORAGE.profiles, all);
+  return all;
+}
+
+function srNameExists(name, ignoredKey = "") {
+  const key = srNameKey(name);
+  const profiles = srNormalizeAllProfiles();
+  return Object.keys(profiles).some((profileKey) => profileKey !== ignoredKey && profileKey === key);
+}
+
+function srSuggestAvailableName(firstName, surname) {
+  const base = srNormalizeName(firstName, surname);
+  if (!base) return "";
+  if (!srNameExists(base)) return base;
+  for (let i = 1; i <= 99; i += 1) {
+    const candidate = `${base}${String(i).padStart(2, "0")}`;
+    if (!srNameExists(candidate)) return candidate;
+  }
+  return `${base}${Date.now().toString().slice(-4)}`;
+}
+
+function srSplitName(name) {
+  const parts = srString(name).split(" ").filter(Boolean);
+  if (parts.length < 2) return { first: parts[0] || "", surname: "" };
+  return { first: parts.shift(), surname: parts.join(" ") };
+}
+
+function srDailyReward(day) {
+  const rewards = [3, 6, 9, 12, 15, 18, 21];
+  return rewards[Math.max(0, Math.min(6, Number(day) - 1))] || 3;
+}
+
+function srLoginReady(profile) {
+  if (!profile) return false;
+  if (!profile.loginClaimAt) return true;
+  return srNow() - profile.loginClaimAt >= CONFIG.dailyResetMs;
+}
+
+function srNextRewardRemaining(profile) {
+  if (!profile || !profile.loginClaimAt) return 0;
+  return Math.max(0, CONFIG.dailyResetMs - (srNow() - profile.loginClaimAt));
+}
+
+function srApplyLogin(profile) {
+  if (!profile) return;
+  const nowTime = srNow();
+  const lastLogin = srSafeNumber(profile.lastLogin);
+  if (!lastLogin) {
+    profile.lastLogin = nowTime;
+    return;
+  }
+  if (nowTime - lastLogin >= CONFIG.dailyResetMs) {
+    profile.loginStreak = Math.min(365, srSafeNumber(profile.loginStreak) + 1);
+  }
+  profile.lastLogin = nowTime;
+}
+
+function srCupMilestones(beforeSteps, afterSteps) {
+  const oldMilestones = Math.floor(beforeSteps / 100);
+  const newMilestones = Math.floor(afterSteps / 100);
+  const delta = Math.max(0, newMilestones - oldMilestones);
+  return delta * SR_PRO.reward.cupsPerHundredSteps;
+}
+
+function srRecordDaily(profile, count) {
+  const key = srIsoDay();
+  profile.daySteps[key] = srSafeNumber(profile.daySteps[key]) + count;
+  return profile.daySteps[key];
+}
+
+function srRecordWeekly(profile, count) {
+  const key = srMondayKey();
+  profile.weekSteps[key] = srSafeNumber(profile.weekSteps[key]) + count;
+  return profile.weekSteps[key];
+}
+
+function srRecordMonthly(profile, count) {
+  const key = srMonthKey();
+  profile.monthSteps[key] = srSafeNumber(profile.monthSteps[key]) + count;
+  return profile.monthSteps[key];
+}
+
+function srRecordStepMutation(profile, count = 1, source = "motion") {
+  const safeCount = Math.max(1, Math.floor(srSafeNumber(count, 1)));
+  srEnsureLocalDay(profile);
+  const before = srSafeNumber(profile.lifetimeSteps);
+  profile.steps = srSafeNumber(profile.steps) + safeCount;
+  profile.stepDayKey = srIsoDay();
+  profile.lifetimeSteps = before + safeCount;
+  srRecordDaily(profile, safeCount);
+  srRecordWeekly(profile, safeCount);
+  srRecordMonthly(profile, safeCount);
+  const milestoneCups = srCupMilestones(before, profile.lifetimeSteps);
+  profile.cups = srSafeNumber(profile.cups) + milestoneCups;
+  profile.stepCupMilestoneCups = srSafeNumber(profile.stepCupMilestoneCups) + milestoneCups;
+  if (source === "motion" || source === "native") {
+    profile.motionSteps = srSafeNumber(profile.motionSteps) + safeCount;
+  }
+  profile.dataBytes = srEstimateBytes(profile);
+  profile.updatedAt = new Date().toISOString();
+  return profile;
+}
+
+function srRecentEntries(map, limit = SR_PRO.maxHistoryRows) {
+  return Object.entries(srObject(map))
+    .sort((a, b) => String(b[0]).localeCompare(String(a[0])))
+    .slice(0, limit)
+    .map(([key, value], index) => ({ index: index + 1, key, value: srSafeNumber(value) }));
+}
+
+function srProfileSnapshot(profile) {
+  if (!profile) return null;
+  return {
+    name: profile.name,
+    role: roleFor(profile.name),
+    steps: srSafeNumber(profile.steps),
+    lifetimeSteps: srSafeNumber(profile.lifetimeSteps),
+    cups: srSafeNumber(profile.cups),
+    daily: srRecentEntries(profile.daySteps, 7),
+    weekly: srRecentEntries(profile.weekSteps, 8),
+    monthly: srRecentEntries(profile.monthSteps, 6),
+    screenTime: srSafeNumber(profile.totalScreenTimeMs),
+    updatedAt: profile.updatedAt || null
+  };
+}
+
+function srProfileChecksum(profile) {
+  const snapshot = srProfileSnapshot(profile);
+  const raw = JSON.stringify(snapshot);
+  let hash = 2166136261;
+  for (let i = 0; i < raw.length; i += 1) {
+    hash ^= raw.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(16).padStart(8, "0");
+}
+
+function srQueueRead() {
+  const queue = srReadJson(SR_STORAGE.queue, []);
+  return Array.isArray(queue) ? queue : [];
+}
+
+function srQueueWrite(queue) {
+  srWriteJson(SR_STORAGE.queue, queue.slice(-SR_PRO.maxSyncQueue));
+}
+
+function srQueuePush(type, payload) {
+  const queue = srQueueRead();
+  queue.push({
+    id: `${srNow()}-${Math.random().toString(16).slice(2)}`,
+    type,
+    payload: srDeepClone(payload),
+    createdAt: new Date().toISOString(),
+  });
+  srQueueWrite(queue);
+}
+
+function srQueueClear() {
+  srWriteJson(SR_STORAGE.queue, []);
+}
+
+function srQueueTypes() {
+  return srQueueRead().reduce((acc, item) => {
+    acc[item.type] = srSafeNumber(acc[item.type]) + 1;
+    return acc;
+  }, {});
+}
+
+function srApiPath(pathName) {
+  return `${API_BASE}${pathName.startsWith("/") ? pathName : `/${pathName}`}`;
+}
+
+async function srFetchJson(pathName, options = {}) {
+  try {
+    const response = await fetch(srApiPath(pathName), {
+      method: options.method || "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      },
+      body: options.body
+    });
+    if (!response.ok) return null;
+    return await response.json();
+  } catch (error) {
+    return null;
+  }
+}
+
+async function srBackendHealth() {
+  const data = await srFetchJson("/health");
+  backendOnline = Boolean(data?.ok);
+  return backendOnline;
+}
+
+async function srSyncProfile(profile) {
+  if (!profile || !backendOnline) return false;
+  const key = state.activeKey || keyFor(...profile.name.split(" "));
+  const response = await srFetchJson("/profiles/sync", {
+    method: "POST",
+    body: JSON.stringify({ key, profile: srDeepClone(profile) })
+  });
+  if (response?.profile) {
+    state.profiles[key] = ensureProfileCompat(response.profile);
+    localStorage.setItem("sr_profiles", JSON.stringify(state.profiles));
+    return true;
+  }
+  return false;
+}
+
+function ensureProfileCompat(profile) {
+  const item = profile || {};
+  item.daySteps = item.daySteps || {};
+  item.weekSteps = item.weekSteps || {};
+  item.monthSteps = item.monthSteps || {};
+  item.feedbacks = item.feedbacks || [];
+  item.eventClaims = item.eventClaims || [];
+  item.winterTasks = item.winterTasks || {};
+  item.role = roleFor(item.name || "");
+  return item;
+}
+
+async function srFlushQueue() {
+  if (!backendOnline || !navigator.onLine) return;
+  const queue = srQueueRead();
+  const remaining = [];
+  for (const item of queue) {
+    let ok = false;
+    if (["profile", "auth"].includes(item.type)) {
+      const response = await srFetchJson("/profiles/sync", {
+        method: "POST",
+        body: JSON.stringify({ key: state.activeKey, profile: window.StepRollerNative ? profilePayloadForBackend(item.payload) : item.payload })
+      });
+      ok = Boolean(response?.ok);
+    }
+    if (item.type === "rename") {
+      const payload = item.payload || {};
+      const response = await srFetchJson("/rename", { method: "POST", body: JSON.stringify({ oldKey: payload.oldKey, profile: window.StepRollerNative ? profilePayloadForBackend(payload.profile) : payload.profile }) });
+      ok = Boolean(response?.ok);
+    }
+    if (item.type === "feedback") {
+      const response = await srFetchJson("/feedback", { method: "POST", body: JSON.stringify(item.payload) });
+      ok = Boolean(response?.ok);
+    }
+    if (!ok) remaining.push(item);
+  }
+  srQueueWrite(remaining);
+}
+
+async function srSaveAndSync(profile, type = "profile") {
+  if (!profile) return;
+  profile.dataBytes = srEstimateBytes(profile);
+  profile.updatedAt = new Date().toISOString();
+  state.profiles[state.activeKey] = profile;
+  localStorage.setItem("sr_profiles", JSON.stringify(state.profiles));
+  srQueuePush(type, profile);
+  await srFlushQueue();
+}
+
+function srIsSunday(ts = srNow()) {
+  return new Date(ts).getDay() === 0;
+}
+
+function srWinterWindow(ts = srNow()) {
+  const date = new Date(ts);
+  const year = date.getFullYear();
+  const start = new Date(year, 9, 1, 0, 0, 0, 0).getTime();
+  const end = new Date(year, 11, 31, 23, 59, 59, 999).getTime();
+  const early = new Date(year, 8, 21, 0, 0, 0, 0).getTime();
+  return {
+    year,
+    inSeason: ts >= start && ts <= end,
+    ownerEarly: ts >= early && ts < start,
+    start,
+    end,
+    early
+  };
+}
+
+function srWinterVisible(profile, ts = srNow()) {
+  const window = srWinterWindow(ts);
+  return window.inSeason || (profile?.role === "owner" && window.ownerEarly);
+}
+
+function srEventKey(ts = srNow()) {
+  return srIsoDay(ts);
+}
+
+function srEventAlreadyClaimed(profile, ts = srNow()) {
+  if (!profile) return false;
+  return srArray(profile.eventClaims).includes(srEventKey(ts));
+}
+
+function srEventProgress(profile, ts = srNow()) {
+  if (!profile) return 0;
+  const day = srIsoDay(ts);
+  return srClamp(srSafeNumber(profile.daySteps?.[day]), 0, SR_PRO.reward.sundaySteps);
+}
+
+function srEventReady(profile, ts = srNow()) {
+  return Boolean(profile && srIsSunday(ts) && srEventProgress(profile, ts) >= SR_PRO.reward.sundaySteps && !srEventAlreadyClaimed(profile, ts));
+}
+
+function srWinterTaskDefinition(id) {
+  return WINTER_TASKS.find((task) => task.id === id) || null;
+}
+
+function srWinterState(profile, id) {
+  if (!profile) return null;
+  const existing = profile.winterTasks?.[id];
+  if (existing) return existing;
+  return {
+    startedAt: 0,
+    startSteps: 0,
+    completed: false,
+    claimed: false,
+    season: srWinterWindow().year
+  };
+}
+
+function srWinterElapsedSeconds(taskState, ts = srNow()) {
+  if (!taskState?.startedAt) return 0;
+  const end = taskState.pausedAt || ts;
+  return Math.max(0, Math.floor((end - taskState.startedAt) / 1000));
+}
+
+function srWinterProgress(profile, task) {
+  if (!profile || !task) return 0;
+  const taskState = srWinterState(profile, task.id);
+  if (!taskState.startedAt) return 0;
+  return Math.max(0, srSafeNumber(profile.lifetimeSteps) - srSafeNumber(taskState.startSteps));
+}
+
+function srWinterReadyToClaim(profile, task) {
+  if (!profile || !task) return false;
+  const taskState = srWinterState(profile, task.id);
+  const steps = srWinterProgress(profile, task);
+  const km = steps / 1000;
+  const elapsed = srWinterElapsedSeconds(taskState);
+  return Boolean(!taskState.claimed && km >= task.targetKm && elapsed <= task.timeLimitSec);
+}
+
+function srSubscriptionLabel(value) {
+  if (value === "lite") return "Lite";
+  if (value === "advance") return "Advance";
+  return "None";
+}
+
+function srSubscriptionActive(profile, ts = srNow()) {
+  if (!profile?.subscription) return null;
+  if (profile.subscription === "lite" && profile.subscriptionUntil && ts >= profile.subscriptionUntil) {
+    return null;
+  }
+  return profile.subscription;
+}
+
+function srSubscriptionPrice(profile, type) {
+  if (profile?.role === "owner") return 0;
+  return type === "advance" ? CONFIG.advancePrice : CONFIG.litePrice;
+}
+
+function srSubscriptionCanClaim(profile, type) {
+  const active = srSubscriptionActive(profile);
+  if (!profile) return false;
+  if (active === type) return false;
+  return ["lite", "advance"].includes(type);
+}
+
+function srActivateSubscription(profile, type) {
+  if (!srSubscriptionCanClaim(profile, type)) return false;
+  profile.subscription = type;
+  profile.subscriptionUntil = type === "lite" ? srNow() + CONFIG.liteDurationMs : null;
+  return true;
+}
+
+function srMorningTarget(ts = srNow()) {
+  const date = new Date(ts);
+  date.setHours(5, 0, 0, 0);
+  return date.getTime();
+}
+
+function srMorningNotificationKey(ts = srNow()) {
+  return `${srIsoDay(ts)}_05`;
+}
+
+function srShouldNotify(ts = srNow()) {
+  const settings = srReadJson(STORAGE.settings, {});
+  if (!settings.notifications) return false;
+  if (!("Notification" in window) || Notification.permission !== "granted") return false;
+  const target = srMorningTarget(ts);
+  if (ts < target) return false;
+  return localStorage.getItem(STORAGE.lastNotice) !== srMorningNotificationKey(ts);
+}
+
+function srMarkNotification(ts = srNow()) {
+  localStorage.setItem(STORAGE.lastNotice, srMorningNotificationKey(ts));
+}
+
+function srMotionReset() {
+  state.motion = state.motion || {};
+  state.motion.lastSample = 0;
+  state.motion.lastPeak = 0;
+  state.motion.peakCount = 0;
+  state.motion.lastStepAt = 0;
+  state.motion.dynamicBaseline = 0;
+  state.motion.filtered = 0;
+  state.motion.confidence = 0;
+}
+
+function srMotionMagnitude(x,y,z) {
+  const ax = srSafeNumber(x);
+  const ay = srSafeNumber(y);
+  const az = srSafeNumber(z);
+  return Math.sqrt(ax * ax + ay * ay + az * az);
+}
+
+function srMotionLowPass(previous,current,alpha) {
+  const a = srClamp(srSafeNumber(alpha, .05), .001, .99);
+  return previous + a * (current - previous);
+}
+
+function srMotionSignal(x,y,z) {
+  const magnitude = srMotionMagnitude(x, y, z);
+  const baseline = srMotionLowPass(srSafeNumber(state.motion.dynamicBaseline), magnitude, SR_PRO.motion.baselineAlpha);
+  const signal = magnitude - baseline;
+  state.motion.dynamicBaseline = baseline;
+  return signal;
+}
+
+function srMotionAcceptableSignal(signal) {
+  const absolute = Math.abs(signal);
+  return absolute >= SR_PRO.motion.minDynamicSignal && absolute <= SR_PRO.motion.maxDynamicSignal;
+}
+
+function srMotionUpdateConfidence(signal,delta) {
+  const intensity = srClamp((Math.abs(signal) - 1.4) / 6.0, 0, 1);
+  const stability = srClamp(1 - Math.abs(delta) / 10, 0, 1);
+  const target = intensity * .75 + stability * .25;
+  state.motion.confidence = srMotionLowPass(srSafeNumber(state.motion.confidence), target, .12);
+}
+
+function srMotionCanCount() {
+  const at = srNow();
+  if (at - srSafeNumber(state.motion.lastStepAt) < SR_PRO.motion.peakCooldownMs) return false;
+  if (srSafeNumber(state.motion.confidence) < SR_PRO.motion.confidenceFloor) return false;
+  return true;
+}
+
+/* Diagnostic helpers below report real application state; no placeholder metrics are persisted. */
+function srBuildDiagnostics() {
+  const profile = profile();
+  const queue = srQueueRead();
+  const diagnostics = {
+    version: SR_PRO.version,
+    screen: state.currentBoard || "daily",
+    online: navigator.onLine,
+    backend: backendOnline,
+    activeProfile: profile?.name || null,
+    role: profile?.role || null,
+    steps: srSafeNumber(profile?.lifetimeSteps),
+    cups: srSafeNumber(profile?.cups),
+    queue: queue.length,
+    queueTypes: srQueueTypes(),
+    checksum: profile ? srProfileChecksum(profile) : null,
+    motionSamples: srSafeNumber(state.motionSamples),
+    motionConfidence: srSafeNumber(state.motion?.confidence),
+    screenTime: srSafeNumber(state.totalScreenMs),
+    generatedAt: new Date().toISOString()
+  };
+  return diagnostics;
+}
+
+function srExposeProfessionalApi() {
+  window.StepRollerPro = {
+    version: SR_PRO.version,
+    diagnostics: srBuildDiagnostics,
+    getProfile: () => profile(),
+    getProfiles: () => srNormalizeAllProfiles(),
+    getQueue: srQueueRead,
+    getWinterWindow: srWinterWindow,
+    getEventProgress: () => srEventProgress(profile()),
+    getSubscription: () => srSubscriptionActive(profile()),
+    suggestName: srSuggestAvailableName,
+    checksum: srProfileChecksum,
+    version: SR_PRO.version
+  };
+}
+
+async function syncProfileToBackend() {
+  const current = profile();
+  if (!current) return;
+  if (!backendOnline) {
+    srQueuePush("profile", profilePayloadForBackend(current));
+    return;
+  }
+  const key = state.activeKey || keyFor(...current.name.split(" "));
+  const response = await srFetchJson("/profiles/sync", {
+    method: "POST",
+    body: JSON.stringify({ key, profile: profilePayloadForBackend(current) })
+  });
+  if (!response?.ok) srQueuePush("profile", profilePayloadForBackend(current));
+}
+
+async function renameProfileOnBackend(oldKey, current) {
+  if (!current) return;
+  state.activeKey = keyFor(...current.name.split(" "));
+  const payload = profilePayloadForBackend(current);
+  if (backendOnline) {
+    const response = await srFetchJson("/rename", { method: "POST", body: JSON.stringify({ oldKey, profile: payload }) });
+    if (!response?.ok) srQueuePush("rename", { oldKey, profile: payload });
+  } else {
+    srQueuePush("rename", { oldKey, profile: payload });
+  }
+}
+
+async function syncFeedbackToBackend(current, text) {
+  if (!current || !text) return;
+  const payload = {
+    profileKey: state.activeKey,
+    name: current.name,
+    text,
+    at: srNow()
+  };
+  if (!backendOnline) {
+    srQueuePush("feedback", payload);
+    return;
+  }
+  const response = await srFetchJson("/feedback", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+  if (!response?.ok) srQueuePush("feedback", payload);
+}
+
+async function checkBackend() {
+  const ok = await srBackendHealth();
+  if (ok) await srFlushQueue();
+  if (ok && profile()) await syncProfileToBackend();
+  renderLeaderboard();
+}
+
+function stepIncrements() {
+  const current = profile();
+  if (!current) return;
+  srRecordStepMutation(current, 1, "motion");
+  state.motionSamples = srSafeNumber(state.motionSamples) + 1;
+  current.dataBytes = srEstimateBytes(current);
+  saveAll();
+  render();
+  scheduleBackendSync();
+}
+
+function requestMotionAccess() {
+  if (state.motionPermissionRequested) return;
+  state.motionPermissionRequested = true;
+  if (typeof DeviceMotionEvent === "undefined") return;
+  if (typeof DeviceMotionEvent.requestPermission === "function") {
+    DeviceMotionEvent.requestPermission().then((permission) => {
+      if (permission !== "granted") toast("Motion permission is required for running detection.");
+    }).catch(() => {});
+  }
+}
+
+function professionalMotionHandler(event) {
+  const current = profile();
+  if (!current) return;
+  const acceleration = event.accelerationIncludingGravity;
+  if (!acceleration) return;
+  const at = srNow();
+  if (at - srSafeNumber(state.motion.lastSample) < SR_PRO.motion.sampleMinGapMs) return;
+  state.motion.lastSample = at;
+  const signal = srMotionSignal(acceleration.x || 0, acceleration.y || 0, acceleration.z || 0);
+  const delta = signal - srSafeNumber(state.motion.filtered);
+  state.motion.filtered = srMotionLowPass(srSafeNumber(state.motion.filtered), signal, SR_PRO.motion.signalAlpha);
+  state.motionSamples = srSafeNumber(state.motionSamples) + 1;
+  srMotionUpdateConfidence(signal, delta);
+  if (!srMotionAcceptableSignal(signal)) return;
+  if (at - srSafeNumber(state.motion.lastPeak) < 90) return;
+  state.motion.lastPeak = at;
+  state.motion.peakCount = srSafeNumber(state.motion.peakCount) + 1;
+  if (state.motion.peakCount < SR_PRO.motion.minPeakCount) return;
+  state.motion.peakCount = 0;
+  if (!srMotionCanCount()) return;
+  state.motion.lastStepAt = at;
+  recordStepIfValid(current);
+}
+
+function recordStepIfValid(current) {
+  if (!current) return false;
+  const changed = srRecordStepMutation(current, 1, "motion");
+  state.profiles[state.activeKey] = changed;
+  localStorage.setItem("sr_profiles", JSON.stringify(state.profiles));
+  scheduleBackendSync();
+  render();
+  return true;
+}
+
+function srStartNativeTracking(name = profile()?.name || "") {
+  if (!window.StepRollerNative || typeof window.StepRollerNative.startTracking !== "function") return false;
+  const normalized = String(name || "").trim().replace(/\s+/g, " ");
+  if (state.nativeProfileNameLastRequested === normalized) return true;
+  try {
+    state.nativeProfileNameLastRequested = normalized;
+    window.StepRollerNative.startTracking(normalized);
+    return true;
+  } catch (error) {
+    console.warn("Native step service could not start", error);
+    return false;
+  }
+}
+
+function srApplyNativeStepDelta(delta) {
+  const current = profile();
+  const count = Math.max(0, Math.min(100000, Math.floor(Number(delta) || 0)));
+  if (!current || !count) return;
+  srRecordStepMutation(current, count, "native");
+  state.profiles[state.activeKey] = current;
+  // Native service owns server step events while it runs in the background.
+  // Save locally here so the same steps are not re-posted as a second increment.
+  srWriteJson(SR_STORAGE.profiles, state.profiles);
+  localStorage.setItem(SR_STORAGE.active, state.activeKey);
+  render();
+}
+
+window.StepRollerConsumeNativeSteps = function StepRollerConsumeNativeSteps() {
+  if (!window.StepRollerNative || !profile()) return;
+  try {
+    const count = Number(window.StepRollerNative.peekPendingSteps?.() ?? window.StepRollerNative.takePendingSteps?.() ?? 0);
+    if (count > 0) {
+      srApplyNativeStepDelta(count);
+      window.StepRollerNative.acknowledgePendingSteps?.(count);
+    }
+  } catch (error) {
+    console.warn("Could not read pending native steps", error);
+  }
+};
+
+function installProfessionalMotionEngine() {
+  if (state.professionalMotionInstalled) return;
+  state.professionalMotionInstalled = true;
+  state.motion = state.motion || {};
+  if (!Number.isFinite(state.motion.dynamicBaseline)) state.motion.dynamicBaseline = 0;
+  if (!Number.isFinite(state.motion.filtered)) state.motion.filtered = 0;
+
+  if (window.StepRollerNative) {
+    window.removeEventListener("devicemotion", professionalMotionHandler);
+    srStartNativeTracking(profile()?.name || "");
+    window.StepRollerNative.setUiAttached?.(true);
+    setTimeout(() => window.StepRollerConsumeNativeSteps?.(), 350);
+    return;
+  }
+
+  window.removeEventListener("devicemotion", professionalMotionHandler);
+  window.addEventListener("devicemotion", professionalMotionHandler, { passive: true });
+  requestMotionAccess();
+}
+
+function claimLogin(day) {
+  const current = profile();
+  if (!current) return toast("Register your profile first.");
+  const targetDay = Math.max(1, Math.min(7, Number(day)));
+  if (targetDay !== Number(current.loginDay || 1)) return toast(`Day ${current.loginDay} is next.`);
+  if (!srLoginReady(current)) return toast(`Next daily claim unlocks after 24 hours.`);
+  const amount = srDailyReward(targetDay);
+  current.cups = srSafeNumber(current.cups) + amount;
+  current.loginClaimAt = srNow();
+  current.loginDay = targetDay >= 7 ? 1 : targetDay + 1;
+  current.dataBytes = srEstimateBytes(current);
+  saveAll();
+  srQueuePush("profile", profilePayloadForBackend(current));
+  syncProfileToBackend();
+  render();
+  toast(`Day ${targetDay} claimed • +${amount} cups`);
+}
+
+function claimSub(type) {
+  const current = profile();
+  if (!current) return toast("Register a profile first.");
+  const normalizedType = type === "advance" ? "advance" : "lite";
+  if (!srSubscriptionCanClaim(current, normalizedType)) return;
+  srActivateSubscription(current, normalizedType);
+  saveAll();
+  srQueuePush("profile", profilePayloadForBackend(current));
+  render();
+  renderSubscriptions();
+  toast(`${srSubscriptionLabel(normalizedType)} claimed.`);
+}
+
+async function renderLeaderboard() {
+  const kind = state.currentBoard || "daily";
+  if (backendOnline) {
+    const data = await srFetchJson(`/leaderboard?board=${encodeURIComponent(kind)}&dayKey=${encodeURIComponent(todayKey())}&weekKey=${encodeURIComponent(getWeekKey(new Date()))}&monthKey=${encodeURIComponent(getMonthKey(new Date()))}`);
+    if (data?.rows) {
+      renderLeaderboardRows(data.rows, kind);
+      return;
+    }
+  }
+  const rows = Object.values(state.profiles).filter((item) => {
+    const itemAge = daysSince(item.createdAt);
+    if (kind === "weekly") return itemAge > 7;
+    if (kind === "monthly") return itemAge > 30;
+    return true;
+  });
+  rows.sort((a, b) => {
+    const scoreA = kind === "daily" ? (a.daySteps[todayKey()] || 0) : kind === "weekly" ? (a.weekSteps[getWeekKey(new Date())] || 0) : (a.monthSteps[getMonthKey(new Date())] || 0);
+    const scoreB = kind === "daily" ? (b.daySteps[todayKey()] || 0) : kind === "weekly" ? (b.weekSteps[getWeekKey(new Date())] || 0) : (b.monthSteps[getMonthKey(new Date())] || 0);
+    if (scoreB !== scoreA) return scoreB - scoreA;
+    return a.name.localeCompare(b.name);
+  });
+  renderLeaderboardRows(rows.map((item, index) => ({
+    name: item.name,
+    role: roleFor(item.name),
+    score: kind === "daily" ? (item.daySteps[todayKey()] || 0) : kind === "weekly" ? (item.weekSteps[getWeekKey(new Date())] || 0) : (item.monthSteps[getMonthKey(new Date())] || 0),
+    days: daysSince(item.createdAt),
+    rank: index + 1
+  })), kind);
+}
+
+function renderLeaderboardRows(rows, kind) {
+  const box = document.getElementById("leaderboard");
+  if (!box) return;
+  if (!rows.length) {
+    box.innerHTML = (kind === "weekly" || kind === "monthly") ? `<div class="empty">No DATA Found</div>` : `<div class="empty">No registered profiles found.</div>`;
+    return;
+  }
+  box.innerHTML = rows.map((row, index) => {
+    const rank = Number(row.rank || index + 1);
+    const steps = Number(row.score ?? row.steps ?? 0);
+    return `<div class="leader-row"><div class="rank">${rank}</div><div class="person"><div class="avatar" style="width:34px;height:34px">${initials(row.name)}</div><div class="meta"><strong>${escapeHtml(row.name)}${tickHtml(row.role)}</strong><small>${titleCase(row.role)}${row.days ? ` • ${row.days} day${row.days > 1 ? "s" : ""}` : ""}</small></div></div><div class="leader-steps">${steps.toLocaleString()}</div></div>`;
+  }).join("");
+}
+
+async function boot() {
+  document.documentElement.classList.toggle("dark", state.theme === "dark");
+  state.profiles = srNormalizeAllProfiles();
+  state.activeKey = localStorage.getItem(SR_STORAGE.active) || localStorage.getItem("sr_active") || "";
+  state.motionSamples = srSafeNumber(localStorage.getItem("sr_motion_samples"));
+  state.professionalMotionInstalled = false;
+  installProfessionalMotionEngine();
+  render();
+  renderWinter();
+  renderSettings();
+  renderSubscriptions();
+  renderSunday();
+  srExposeProfessionalApi();
+  setTimeout(() => document.getElementById("splash")?.classList.add("hide"), 1650);
+  const offlineGate = document.getElementById("offlineGate");
+  if (!navigator.onLine) offlineGate?.classList.add("visible");
+  window.addEventListener("online", () => offlineGate?.classList.remove("visible"));
+  window.addEventListener("offline", () => offlineGate?.classList.add("visible"));
+  await checkBackend();
+  if (navigator.onLine) await srFlushQueue();
+  morningNotification();
+  setInterval(() => {
+    const current = profile();
+    if (current) {
+      const dayChanged = srEnsureLocalDay(current);
+      if (dayChanged) saveAll();
+      if (window.StepRollerNative) {
+        srStartNativeTracking(current.name);
+        window.StepRollerConsumeNativeSteps?.();
+      }
+      render();
+      renderRewards();
+      renderSettings();
+    }
+    srShouldNotify();
+  }, 5000);
+}
+
+window.addEventListener("online", async () => {
+  backendOnline = await srBackendHealth();
+  if (backendOnline) await srFlushQueue();
+  toast("Connection restored.");
+});
+
+window.addEventListener("offline", () => {
+  backendOnline = false;
+  toast("Offline • motion counting can continue in the active app.");
+});
+
+window.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    requestMotionAccess();
+    scheduleMorningNotificationCheck?.();
+  }
+});
+
+window.addEventListener("beforeunload", () => {
+  const current = profile();
+  if (current) {
+    current.dataBytes = srEstimateBytes(current);
+    state.profiles[state.activeKey] = current;
+    localStorage.setItem("sr_profiles", JSON.stringify(state.profiles));
+  }
+});
+
+const SR_INVARIANTS = Object.freeze({
+  DAILY_WINDOW_MS: 86400000,
+  WEEKLY_ELIGIBILITY_DAYS: 7,
+  MONTHLY_ELIGIBILITY_DAYS: 30,
+  DISTANCE_STEPS_PER_KM: 1000,
+  CUPS_PER_100_STEPS: 5,
+  CHANGE_NAME_COST_CUPS: 100,
+  SUNDAY_TARGET_STEPS: 100000,
+  SUNDAY_REWARD_CUPS: 1500,
+  LITE_DURATION_DAYS: 30,
+  LITE_PRICE_RUPEES: 99,
+  ADVANCE_PRICE_RUPEES: 299,
+  WINTER_MONTH_START: 10,
+  WINTER_MONTH_END: 12,
+  HOME_RING_RESET: "local-midnight",
+  BACKGROUND_STEPS: "native-android-step-sensor"
+});
+
+window.StepRollerInvariants = SR_INVARIANTS;
+
+boot();
+</script>
+</body>
+</html>
